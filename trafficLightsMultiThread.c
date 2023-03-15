@@ -70,6 +70,7 @@ static void testButton(char *buttonPort1, char *buttonPort2) {
     //https://www.dummies.com/article/technology/computers/hardware/beaglebone/setting-beaglebone-gpios-as-inputs-144958/
 
     while(1) {
+        printf("%d", readLED("/value", buttonPort1);
         if(readLED("/value", buttonPort1) == 1) {
             (void) printf("PRESSED");
         }
