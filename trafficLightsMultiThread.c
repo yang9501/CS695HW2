@@ -31,7 +31,7 @@ static int readGPIO(char *filename, char *port);
 static void setLightInitialState(char *greenPort, char *yellowPort, char *redPort);
 
 //Primary light switch logic
-static void cycleLights(char *greenPort1, char *yellowPort1, char *redPort1, char *greenPort2, char *yellowPort2, char *redPort2);
+static void *cycleLights(void *greenPort, void *yellowPort, void *redPort);
 
 void *getButtonPressDuration(void *buttonPort);
 
@@ -59,28 +59,19 @@ int main(void) {
     }
     #endif
 
-    //getButtonPressDuration(buttonPorts[0]);
-//   while(1) {
-//		cycleLights(trafficLight1Ports[0], trafficLight1Ports[1], trafficLight1Ports[2], trafficLight2Ports[0], trafficLight2Ports[1], trafficLight2Ports[2]);
-//	}
-
     setLightInitialState(trafficLight1Ports[0], trafficLight1Ports[1], trafficLight1Ports[2]);
     setLightInitialState(trafficLight2Ports[0], trafficLight2Ports[1], trafficLight2Ports[2]);
 
-    pthread_t thread1, thread2;
-    char *message1 = "Thread 1";
-    char *message2 = "Thread 2";
+    pthread_t thread1, thread2, thread3, thread4;
     int buttonListener1, buttonListener2;
 
     /* Create independent threads each of which will execute function */
-
-    buttonListener1 = pthread_create( &thread1, NULL, getButtonPressDuration, (void*) buttonPorts[0]);
-    buttonListener2 = pthread_create( &thread2, NULL, getButtonPressDuration, (void*) buttonPorts[1]);
+    pthread_create( &thread1, NULL, getButtonPressDuration, (void*) buttonPorts[0]);
+    pthread_create( &thread2, NULL, getButtonPressDuration, (void*) buttonPorts[1]);
+    pthread_create( &thread3, NULL, cycleLights, (void*) trafficLight1Ports[0], (void*) trafficLight1Ports[1], (void*) trafficLight1Ports[2]);
     pthread_join( thread1, NULL);
     pthread_join( thread2, NULL);
 
-    printf("hello");
-    fflush( stdout );
 	return 0;
 }
 
@@ -130,57 +121,31 @@ static void setLightInitialState(char *greenPort, char *yellowPort, char *redPor
     #endif
 }
 
-static void cycleLights(char *greenPort1, char *yellowPort1, char *redPort1, char *greenPort2, char *yellowPort2, char *redPort2) {
+static void *cycleLights(void *greenPort, void *yellowPort, void *redPort) {
     #ifdef DEBUG
-    (void) printf("Green1 on: %s\n", greenPort1);
-    (void) printf("Red2 on: %s\n", redPort2);
+    (void) printf("Green1 on: %s\n", (char *)greenPort);
     #else
-    (void) writeLED("/value", greenPort1, "1");
-    (void) writeLED("/value", redPort2, "1");
+    (void) writeLED("/value", (char *)greenPort, "1");
     #endif
 	
     sleep(10);
 
     #ifdef DEBUG
-    (void) printf("Green1 off: %s\n", greenPort1);
-    (void) printf("Yellow1 on: %s\n", yellowPort1);
+    (void) printf("Green1 off: %s\n", (char *)greenPort);
+    (void) printf("Yellow1 on: %s\n", (char *)yellowPort);
     #else
-    (void) writeLED("/value", greenPort1, "0");
-    (void) writeLED("/value", yellowPort1, "1");
+    (void) writeLED("/value", (char *)greenPort, "0");
+    (void) writeLED("/value", (char *)yellowPort, "1");
     #endif
 	
     sleep(5);
 
     #ifdef DEBUG
-    (void) printf("Yellow1 off: %s\n", yellowPort1);
-    (void) printf("Red1 on: %s\n", redPort1);
-    (void) printf("Green2 on: %s\n", greenPort2);
-    (void) printf("Red2 off: %s\n", redPort2);
+    (void) printf("Yellow1 off: %s\n", (char *)yellowPort);
+    (void) printf("Red1 on: %s\n", (char *)redPort);
     #else
-    (void) writeLED("/value", yellowPort1, "0");
-    (void) writeLED("/value", redPort1, "1");
-    (void) writeLED("/value", greenPort2, "1");
-    (void) writeLED("/value", redPort2, "0");
-    #endif
-
-    sleep(10);
-
-    #ifdef DEBUG
-    (void) printf("Green2 off: %s\n", greenPort2);
-    (void) printf("Yellow2 on: %s\n", yellowPort2);
-    #else
-    (void) writeLED("/value", greenPort2, "0");
-    (void) writeLED("/value", yellowPort2, "1");
-    #endif
-
-    sleep(5);
-
-    #ifdef DEBUG
-    (void) printf("Yellow2 off: %s\n", yellowPort2);
-    (void) printf("Red1 off: %s\n", redPort1);
-    #else
-    (void) writeLED("/value", yellowPort2, "0");
-    (void) writeLED("/value", redPort1, "0");
+    (void) writeLED("/value", (char *)yellowPort, "0");
+    (void) writeLED("/value", (char *)redPort, "1");
     #endif
 }
 
