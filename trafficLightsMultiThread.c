@@ -25,12 +25,13 @@
 //Writes specified value to specified GPIO directory
 static void writeLED(char *filename, char *port, char *value);
 
-static int readLED(char *filename, char *port);
+//Reads input to GPIO pin
+static int readGPIO(char *filename, char *port);
 
 //Primary light switch logic
 static void cycleLights(char *greenPort1, char *yellowPort1, char *redPort1, char *greenPort2, char *yellowPort2, char *redPort2);
 
-static void testButton(char *buttonPort1, char *buttonPort2);
+static void getButtonPressDuration(char *buttonPort);
 
 int main(void) {
     //arrays containing GPIO port definitions, representing each of the two traffic lights
@@ -56,7 +57,7 @@ int main(void) {
     }
     #endif
 
-    testButton(buttonPorts[0], buttonPorts[1]);
+    getButtonPressDuration(buttonPorts[0]);
 //   while(1) {
 //		cycleLights(trafficLight1Ports[0], trafficLight1Ports[1], trafficLight1Ports[2], trafficLight2Ports[0], trafficLight2Ports[1], trafficLight2Ports[2]);
 //	}
@@ -64,7 +65,7 @@ int main(void) {
 	return 0;
 }
 
-static void testButton(char *buttonPort1, char *buttonPort2) {
+static void getButtonPressDuration(char *buttonPort) {
     //https://www.youtube.com/watch?v=b2_jS3ZMwtM
     //https://forum.beagleboard.org/t/reading-gpio-state-in-beagle-bone-black/1649
     //https://www.dummies.com/article/technology/computers/hardware/beaglebone/setting-beaglebone-gpios-as-inputs-144958/
@@ -74,7 +75,7 @@ static void testButton(char *buttonPort1, char *buttonPort2) {
     int pressedFlag = 0;
     int gpioValue;
     while(1) {
-        gpioValue = readLED("/value", buttonPort1);
+        gpioValue = readGPIO("/value", buttonPort);
         //printf("%d", pressedFlag);
         if(gpioValue == 1){
             //first press detected
@@ -82,7 +83,7 @@ static void testButton(char *buttonPort1, char *buttonPort2) {
                 printf("FIRST PRESSED");
                 start_time = time(NULL);
                 printf("%ld", start_time);
-                fflush( stdout );
+                fflush( stdout );   //https://stackoverflow.com/questions/16870059/printf-not-printing-to-screen
                 pressedFlag = 1;
             }
         }
@@ -152,7 +153,7 @@ static void cycleLights(char *greenPort1, char *yellowPort1, char *redPort1, cha
     #endif
 }
 
-static int readLED(char *filename, char *port) {
+static int readGPIO(char *filename, char *port) {
     FILE* fp; //create file pointer
     char fullFileName[100]; //store path and filename
     int val;
