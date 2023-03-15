@@ -82,6 +82,7 @@ int main(void) {
     printf("Thread 2 returns: %d\n",iret2);
 
     printf("hello");
+    fflush( stdout );
 	return 0;
 }
 
