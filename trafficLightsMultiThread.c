@@ -80,16 +80,16 @@ static void testButton(char *buttonPort1, char *buttonPort2) {
             //first press detected
             if(pressedFlag == 0) {
                 printf("FIRST PRESSED");
-                start_time = time(&start_time);
+                start_time = time(NULL);
                 pressedFlag = 1;
             }
         }
         if(ledValue == 0) {
             //if the button is let go after being pressed
             if(pressedFlag == 1) {
-                end_time = time(&end_time);
+                end_time = time(NULL);
                 pressedFlag = 0;
-                printf("%ld", end_time - start_time);
+                printf("%d", end_time - start_time);
             }
         }
     }
