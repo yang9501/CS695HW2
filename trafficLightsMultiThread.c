@@ -33,7 +33,7 @@ static void cycleLights(char *greenPort1, char *yellowPort1, char *redPort1, cha
 
 static void getButtonPressDuration(char *buttonPort);
 
-void *print_message_function( void *ptr );
+void *print_message_function( void *ptr, int x );
 
 int main(void) {
     //arrays containing GPIO port definitions, representing each of the two traffic lights
@@ -72,8 +72,8 @@ int main(void) {
 
     /* Create independent threads each of which will execute function */
 
-    iret1 = pthread_create( &thread1, NULL, print_message_function, (void*) message1);
-    iret2 = pthread_create( &thread2, NULL, print_message_function, (void*) message2);
+    iret1 = pthread_create( &thread1, NULL, print_message_function, (void*) message1, 2);
+    iret2 = pthread_create( &thread2, NULL, print_message_function, (void*) message2, 5);
     pthread_join( thread1, NULL);
     pthread_join( thread2, NULL);
     printf("Thread 1 returns: %d\n",iret1);
@@ -82,11 +82,11 @@ int main(void) {
 	return 0;
 }
 
-void *print_message_function( void *ptr ) {
+void *print_message_function( void *ptr, int x ) {
     char *message;
     message = (char *) ptr;
     printf("%s \n", message);
-    sleep(5);
+    sleep(x);
 }
 
 static void getButtonPressDuration(char *buttonPort) {
