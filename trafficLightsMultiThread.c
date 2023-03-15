@@ -28,6 +28,8 @@ static void writeLED(char *filename, char *port, char *value);
 //Reads input to GPIO pin
 static int readGPIO(char *filename, char *port);
 
+static void setLightInitialState(char *greenPort, char *yellowPort, char *redPort);
+
 //Primary light switch logic
 static void cycleLights(char *greenPort1, char *yellowPort1, char *redPort1, char *greenPort2, char *yellowPort2, char *redPort2);
 
@@ -66,16 +68,18 @@ int main(void) {
 //		cycleLights(trafficLight1Ports[0], trafficLight1Ports[1], trafficLight1Ports[2], trafficLight2Ports[0], trafficLight2Ports[1], trafficLight2Ports[2]);
 //	}
 
+    setLightInitialState(trafficLight1Ports[0], trafficLight1Ports[1], trafficLight1Ports[2]);
+    setLightInitialState(trafficLight2Ports[0], trafficLight2Ports[1], trafficLight2Ports[2]);
 
     pthread_t thread1, thread2;
     char *message1 = "Thread 1";
     char *message2 = "Thread 2";
-    int iret1, iret2;
+    int buttonListener1, buttonListener2;
 
     /* Create independent threads each of which will execute function */
 
-    iret1 = pthread_create( &thread1, NULL, print_message_function_1, (void*) message1);
-    iret2 = pthread_create( &thread2, NULL, print_message_function_2, (void*) message2);
+    buttonListener1 = pthread_create( &thread1, NULL, &getButtonPressDuration, (void*) buttonPorts[0]);
+    buttonListener2 = pthread_create( &thread2, NULL, &getButtonPressDuration, (void*) buttonPorts[1]);
     pthread_join( thread1, NULL);
     pthread_join( thread2, NULL);
     printf("Thread 1 returns: %d\n",iret1);
@@ -132,6 +136,18 @@ static void getButtonPressDuration(char *buttonPort) {
             }
         }
     }
+}
+
+static void setLightInitialState(char *greenPort, char *yellowPort, char *redPort) {
+    #ifdef DEBUG
+    (void) printf("Green off: %s\n", greenPort);
+    (void) printf("Yellow off: %s\n", yellowPort);
+    (void) printf("Red on: %s\n", redPort);
+    #else
+    (void) writeLED("/value", greenPort, "0");
+    (void) writeLED("/value", yellowPort, "0");
+    (void) writeLED("/value", redPort, "1");
+    #endif
 }
 
 static void cycleLights(char *greenPort1, char *yellowPort1, char *redPort1, char *greenPort2, char *yellowPort2, char *redPort2) {
