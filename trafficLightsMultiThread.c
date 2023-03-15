@@ -69,18 +69,29 @@ static void testButton(char *buttonPort1, char *buttonPort2) {
     //https://forum.beagleboard.org/t/reading-gpio-state-in-beagle-bone-black/1649
     //https://www.dummies.com/article/technology/computers/hardware/beaglebone/setting-beaglebone-gpios-as-inputs-144958/
     //https://learn.adafruit.com/connecting-a-push-button-to-beaglebone-black/wiring
+    time_t start_time;
+    time_t end_time;
+    int pressedFlag = 0;
+    int ledValue;
     while(1) {
-        if(readLED("/value", buttonPort1) == 1) {
-            printf("PRESSED");
-            time_t start_time = time(&start_time);
-            printf("%ld", seconds);
-            //time_t end_time;
-            //while(readLED("/value", buttonPort1) == 1) {
-            //   continue;
-            //}
-            //time_t heldLength = time(&end_time) - start_time;
-            //printf("%d", heldLength);
+        ledValue = readLED("/value", buttonPort1);
+        if(ledValue == 1) ) {
+            //printf("PRESSED");
+            //first press detected
+            if(pressedFlag == 0) {
+                start_time = time(&start_time);
+                pressedFlag = 1;
+            }
         }
+        if(ledValue == 0) ) {
+            //if the button is let go after being pressed
+            if(pressedFlag == 1) {
+                end_time = time(&end_time);
+                pressedFlag = 0;
+                printf("%ld", end_time - start_time);
+            }
+        }
+}
     }
 }
 
