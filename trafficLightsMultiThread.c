@@ -33,6 +33,8 @@ static void cycleLights(char *greenPort1, char *yellowPort1, char *redPort1, cha
 
 static void getButtonPressDuration(char *buttonPort);
 
+void *print_message_function( void *ptr );
+
 int main(void) {
     //arrays containing GPIO port definitions, representing each of the two traffic lights
 	char trafficLight1Ports[3][25] = {GPIO_PATH_44, GPIO_PATH_68, GPIO_PATH_67};
