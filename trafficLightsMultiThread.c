@@ -72,9 +72,9 @@ static void testButton(char *buttonPort1, char *buttonPort2) {
     time_t start_time;
     time_t end_time;
     int pressedFlag = 0;
-    int ledValue;
+    int gpioValue;
     while(1) {
-        ledValue = readLED("/value", buttonPort1);
+        gpioValue = readLED("/value", buttonPort1);
         printf("%d", pressedFlag);
         if(ledValue == 1){
             //first press detected
@@ -82,15 +82,17 @@ static void testButton(char *buttonPort1, char *buttonPort2) {
                 printf("FIRST PRESSED");
                 start_time = time(NULL);
                 printf("%ld", start_time);
+                fflush( stdout );
                 pressedFlag = 1;
             }
         }
-        if(ledValue == 0) {
+        if(gpioValue == 0) {
             //if the button is let go after being pressed
             if(pressedFlag == 1) {
                 end_time = time(NULL);
                 pressedFlag = 0;
                 printf("%ld", end_time - start_time);
+                fflush( stdout );
             }
         }
     }
