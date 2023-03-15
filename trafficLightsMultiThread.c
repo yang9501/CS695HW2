@@ -68,9 +68,9 @@ static void testButton(char *buttonPort1, char *buttonPort2) {
     //https://www.youtube.com/watch?v=b2_jS3ZMwtM
     //https://forum.beagleboard.org/t/reading-gpio-state-in-beagle-bone-black/1649
     //https://www.dummies.com/article/technology/computers/hardware/beaglebone/setting-beaglebone-gpios-as-inputs-144958/
-
+    //https://learn.adafruit.com/connecting-a-push-button-to-beaglebone-black/wiring
     while(1) {
-        printf("%d", readLED("/value", buttonPort1);
+        printf("%d", readLED("/value", buttonPort1));
         if(readLED("/value", buttonPort1) == 1) {
             (void) printf("PRESSED");
         }
