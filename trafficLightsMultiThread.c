@@ -132,21 +132,21 @@ void *cycleLights(void *trafficLightPortsPointer) {
     sleep(10);
 
     #ifdef DEBUG
-    (void) printf("Green1 off: %s\n", (char *)trafficLightPorts[0]);
-    (void) printf("Yellow1 on: %s\n", (char *)trafficLightPorts[1]);
+    (void) printf("Green1 off: %s\n", &trafficLightPorts[0]);
+    (void) printf("Yellow1 on: %s\n", &trafficLightPorts[1]);
     #else
-    (void) writeLED("/value", (char *)trafficLightPorts[0], "0");
-    (void) writeLED("/value", (char *)trafficLightPorts[1], "1");
+    (void) writeLED("/value", &trafficLightPorts[0], "0");
+    (void) writeLED("/value", &trafficLightPorts[1], "1");
     #endif
 	
     sleep(5);
 
     #ifdef DEBUG
-    (void) printf("Yellow1 off: %s\n", (char *)trafficLightPorts[1]);
-    (void) printf("Red1 on: %s\n", (char *)trafficLightPorts[2]);
+    (void) printf("Yellow1 off: %s\n", &trafficLightPorts[1]);
+    (void) printf("Red1 on: %s\n", &trafficLightPorts[2]);
     #else
-    (void) writeLED("/value", (char *)trafficLightPorts[1], "0");
-    (void) writeLED("/value", (char *)trafficLightPorts[2], "1");
+    (void) writeLED("/value", &trafficLightPorts[1], "0");
+    (void) writeLED("/value", &trafficLightPorts[2], "1");
     #endif
 }
 
