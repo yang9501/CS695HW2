@@ -72,6 +72,7 @@ static void testButton(char *buttonPort1, char *buttonPort2) {
     fp = fopen(fullFileName, "r"); //open file for writing
     while(1) {
         (void) fscanf(fp, "%d", &val);
+        (void) printf("%d", val);
         if(val == 1) {
             (void) printf("PRESSED");
         }
