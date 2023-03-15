@@ -35,10 +35,6 @@ static void cycleLights(char *greenPort1, char *yellowPort1, char *redPort1, cha
 
 void *getButtonPressDuration(void *buttonPort);
 
-void *print_message_function_1( void *ptr );
-
-void *print_message_function_2( void *ptr );
-
 int main(void) {
     //arrays containing GPIO port definitions, representing each of the two traffic lights
 	char trafficLight1Ports[3][25] = {GPIO_PATH_44, GPIO_PATH_68, GPIO_PATH_67};
@@ -88,20 +84,6 @@ int main(void) {
 	return 0;
 }
 
-void *print_message_function_1( void *ptr ) {
-    char *message;
-    message = (char *) ptr;
-    printf("%s \n", message);
-    sleep(5);
-}
-
-void *print_message_function_2( void *ptr ) {
-    char *message;
-    message = (char *) ptr;
-    printf("%s \n", message);
-    sleep(2);
-}
-
 void *getButtonPressDuration(void *buttonPort) {
     //https://www.youtube.com/watch?v=b2_jS3ZMwtM
     //https://forum.beagleboard.org/t/reading-gpio-state-in-beagle-bone-black/1649
@@ -117,9 +99,9 @@ void *getButtonPressDuration(void *buttonPort) {
         if(gpioValue == 1){
             //first press detected
             if(pressedFlag == 0) {
-                printf("FIRST PRESSED");
+                //printf("FIRST PRESSED");
                 start_time = time(NULL);
-                printf("%ld", start_time);
+                //printf("%ld", start_time);
                 fflush( stdout );   //https://stackoverflow.com/questions/16870059/printf-not-printing-to-screen
                 pressedFlag = 1;
             }
@@ -129,7 +111,7 @@ void *getButtonPressDuration(void *buttonPort) {
             if(pressedFlag == 1) {
                 end_time = time(NULL);
                 pressedFlag = 0;
-                printf("%ld", end_time - start_time);
+                printf("Button press time: %ld", end_time - start_time);
                 fflush( stdout );
             }
         }
