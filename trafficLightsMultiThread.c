@@ -9,7 +9,7 @@
 #include <time.h>
 
 //comment out to live run
-#define DEBUG 1
+//#define DEBUG 1
 
 #define GPIO_PATH_44 "/sys/class/gpio/gpio44" //Green 1
 #define GPIO_PATH_68 "/sys/class/gpio/gpio68" //Yellow 1
@@ -128,34 +128,32 @@ static void setLightInitialState(char *greenPort, char *yellowPort, char *redPor
 }
 
 void *cycleLights(void *ptr) {
-    char * trafficLightPorts = (char*)ptr;
-    printf("%s", trafficLightPorts[0]);
     #ifdef DEBUG
-    (void) printf("Green1 on: %s\n", trafficLightPorts[0]);
-    (void) printf("Red1 off: %s\n", trafficLightPorts[2]);
+    (void) printf("Green1 on: %s\n", GPIO_PATH_44);
+    (void) printf("Red1 off: %s\n", GPIO_PATH_67);
     #else
-    (void) writeLED("/value", trafficLightPorts[0], "1");
-    (void) writeLED("/value", trafficLightPorts[2], "0");
+    (void) writeLED("/value", GPIO_PATH_44, "1");
+    (void) writeLED("/value", GPIO_PATH_67, "0");
     #endif
 	
     sleep(10);
 
     #ifdef DEBUG
-    (void) printf("Green1 off: %s\n", trafficLightPorts[0]);
-    (void) printf("Yellow1 on: %s\n", trafficLightPorts[1]);
+    (void) printf("Green1 off: %s\n", GPIO_PATH_44);
+    (void) printf("Yellow1 on: %s\n", GPIO_PATH_68);
     #else
-    (void) writeLED("/value", trafficLightPorts[0], "0");
-    (void) writeLED("/value", trafficLightPorts[1], "1");
+    (void) writeLED("/value", GPIO_PATH_44, "0");
+    (void) writeLED("/value", GPIO_PATH_68, "1");
     #endif
 	
     sleep(5);
 
     #ifdef DEBUG
-    (void) printf("Yellow1 off: %s\n", trafficLightPorts[1]);
-    (void) printf("Red1 on: %s\n", trafficLightPorts[2]);
+    (void) printf("Yellow1 off: %s\n", GPIO_PATH_68);
+    (void) printf("Red1 on: %s\n", GPIO_PATH_67);
     #else
-    (void) writeLED("/value", trafficLightPorts[1], "0");
-    (void) writeLED("/value", trafficLightPorts[2], "1");
+    (void) writeLED("/value", GPIO_PATH_68, "0");
+    (void) writeLED("/value", GPIO_PATH_67, "1");
     #endif
 }
 
