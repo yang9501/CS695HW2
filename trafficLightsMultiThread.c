@@ -90,7 +90,7 @@ static void testButton(char *buttonPort1, char *buttonPort2) {
             if(pressedFlag == 1) {
                 end_time = time(NULL);
                 pressedFlag = 0;
-                printf("%d", end_time - start_time);
+                printf("%ld", end_time - start_time);
             }
         }
     }
