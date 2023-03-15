@@ -128,7 +128,7 @@ static void setLightInitialState(char *greenPort, char *yellowPort, char *redPor
 }
 
 void *cycleLights(void *ptr) {
-    char * trafficLightPorts = ptr[0];
+    char * trafficLightPorts = (char*)ptr;
     printf("%c", trafficLightPorts[0]);
     #ifdef DEBUG
     (void) printf("Green1 on: %s\n", trafficLightPorts[0]);
