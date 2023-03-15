@@ -72,13 +72,13 @@ static void testButton(char *buttonPort1, char *buttonPort2) {
     while(1) {
         if(readLED("/value", buttonPort1) == 1) {
             printf("PRESSED");
-            time_t start_time = time(&start_time);
-            time_t end_time;
-            while(readLED("/value", buttonPort1) == 1) {
-                continue;
-            }
-            time_t heldLength = time(&end_time) - start_time;
-            printf("%d", heldLength);
+            //time_t start_time = time(&start_time);
+            //time_t end_time;
+            //while(readLED("/value", buttonPort1) == 1) {
+            //   continue;
+            //}
+            //time_t heldLength = time(&end_time) - start_time;
+            //printf("%d", heldLength);
         }
     }
 }
