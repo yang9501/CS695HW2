@@ -31,7 +31,7 @@ static int readGPIO(char *filename, char *port);
 static void setLightInitialState(char *greenPort, char *yellowPort, char *redPort);
 
 //Primary light switch logic
-static void *cycleLights(void *trafficLightPorts);
+void *cycleLights(void *trafficLightPorts);
 
 void *getButtonPressDuration(void *buttonPort);
 
@@ -121,13 +121,12 @@ static void setLightInitialState(char *greenPort, char *yellowPort, char *redPor
     #endif
 }
 
-static void *cycleLights(void *trafficLightPorts) {
-    char* trafficLightPortsArray = (char**) trafficLightPorts;
-    char * greenPort = trafficLightPortsArray[0];
+void *cycleLights(void *trafficLightPortsPointer) {
+    char* trafficLightPorts = trafficLightPortsPointer
     #ifdef DEBUG
-    (void) printf("Green1 on: %s\n", (char *)trafficLightPorts[0]);
+    (void) printf("Green1 on: %s\n", trafficLightPorts[0]);
     #else
-    (void) writeLED("/value", (char *)trafficLightPorts[0], "1");
+    (void) writeLED("/value", trafficLightPorts[0], "1");
     #endif
 	
     sleep(10);
