@@ -33,7 +33,7 @@ static void setLightInitialState(char *greenPort, char *yellowPort, char *redPor
 //Primary light switch logic
 static void cycleLights(char *greenPort1, char *yellowPort1, char *redPort1, char *greenPort2, char *yellowPort2, char *redPort2);
 
-static void *getButtonPressDuration(char *buttonPort);
+void *getButtonPressDuration(void *buttonPort);
 
 void *print_message_function_1( void *ptr );
 
@@ -102,7 +102,7 @@ void *print_message_function_2( void *ptr ) {
     sleep(2);
 }
 
-static void *getButtonPressDuration(char *buttonPort) {
+void *getButtonPressDuration(void *buttonPort) {
     //https://www.youtube.com/watch?v=b2_jS3ZMwtM
     //https://forum.beagleboard.org/t/reading-gpio-state-in-beagle-bone-black/1649
     //https://www.dummies.com/article/technology/computers/hardware/beaglebone/setting-beaglebone-gpios-as-inputs-144958/
@@ -112,7 +112,7 @@ static void *getButtonPressDuration(char *buttonPort) {
     int pressedFlag = 0;
     int gpioValue;
     while(1) {
-        gpioValue = readGPIO("/value", buttonPort);
+        gpioValue = readGPIO("/value", (char *) buttonPort);
         //printf("%d", pressedFlag);
         if(gpioValue == 1){
             //first press detected
