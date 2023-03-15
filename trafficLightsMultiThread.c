@@ -83,7 +83,7 @@ static void testButton(char *buttonPort1, char *buttonPort2) {
                 pressedFlag = 1;
             }
         }
-        if(ledValue == 0) ) {
+        if(ledValue == 0) {
             //if the button is let go after being pressed
             if(pressedFlag == 1) {
                 end_time = time(&end_time);
@@ -91,7 +91,6 @@ static void testButton(char *buttonPort1, char *buttonPort2) {
                 printf("%ld", end_time - start_time);
             }
         }
-}
     }
 }
 
