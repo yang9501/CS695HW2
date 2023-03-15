@@ -79,7 +79,7 @@ static void testButton(char *buttonPort1, char *buttonPort2) {
             //printf("%d", pressedFlag);
             //first press detected
             if(pressedFlag == 0) {
-                //printf("FIRST PRESSED");
+                printf("FIRST PRESSED");
                 start_time = time(NULL);
                 printf("%ld", start_time);
                 pressedFlag = 1;
