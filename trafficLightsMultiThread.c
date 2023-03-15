@@ -37,8 +37,8 @@ void *getButtonPressDuration(void *buttonPort);
 
 int main(void) {
     //arrays containing GPIO port definitions, representing each of the two traffic lights
-	char trafficLight1Ports[3] = {GPIO_PATH_44, GPIO_PATH_68, GPIO_PATH_67};
-	char trafficLight2Ports[3] = {GPIO_PATH_26, GPIO_PATH_46, GPIO_PATH_65};
+	char trafficLight1Ports[3][25] = {GPIO_PATH_44, GPIO_PATH_68, GPIO_PATH_67};
+	char trafficLight2Ports[3][25] = {GPIO_PATH_26, GPIO_PATH_46, GPIO_PATH_65};
     char buttonPorts[2][25] = {GPIO_PATH_66, GPIO_PATH_69};
 
     #ifdef DEBUG
@@ -125,11 +125,11 @@ void *cycleLights(void *ptr) {
     char* trafficLightPorts;
     trafficLightPorts = (char *) ptr;
     #ifdef DEBUG
-    (void) printf("Green1 on: %s\n", &trafficLightPorts[0]);
-    (void) printf("Red1 off: %s\n", &trafficLightPorts[2]);
+    (void) printf("Green1 on: %s\n", trafficLightPorts[0]);
+    (void) printf("Red1 off: %s\n", trafficLightPorts[2]);
     #else
-    (void) writeLED("/value", &trafficLightPorts[0], "1");
-    (void) writeLED("/value", &trafficLightPorts[2], "0");
+    (void) writeLED("/value", trafficLightPorts[0], "1");
+    (void) writeLED("/value", trafficLightPorts[2], "0");
     #endif
 	
     sleep(10);
@@ -138,8 +138,8 @@ void *cycleLights(void *ptr) {
     (void) printf("Green1 off: %s\n", trafficLightPorts[0]);
     (void) printf("Yellow1 on: %s\n", trafficLightPorts[1]);
     #else
-    (void) writeLED("/value", &trafficLightPorts[0], "0");
-    (void) writeLED("/value", &trafficLightPorts[1], "1");
+    (void) writeLED("/value", trafficLightPorts[0], "0");
+    (void) writeLED("/value", trafficLightPorts[1], "1");
     #endif
 	
     sleep(5);
@@ -148,8 +148,8 @@ void *cycleLights(void *ptr) {
     (void) printf("Yellow1 off: %s\n", trafficLightPorts[1]);
     (void) printf("Red1 on: %s\n", trafficLightPorts[2]);
     #else
-    (void) writeLED("/value", &trafficLightPorts[1], "0");
-    (void) writeLED("/value", &trafficLightPorts[2], "1");
+    (void) writeLED("/value", trafficLightPorts[1], "0");
+    (void) writeLED("/value", trafficLightPorts[2], "1");
     #endif
 }
 
