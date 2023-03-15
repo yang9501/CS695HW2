@@ -37,8 +37,8 @@ void *getButtonPressDuration(void *buttonPort);
 
 int main(void) {
     //arrays containing GPIO port definitions, representing each of the two traffic lights
-	char trafficLight1Ports[3][25] = {GPIO_PATH_44, GPIO_PATH_68, GPIO_PATH_67};
-	char trafficLight2Ports[3][25] = {GPIO_PATH_26, GPIO_PATH_46, GPIO_PATH_65};
+	char trafficLight1Ports[3] = {GPIO_PATH_44, GPIO_PATH_68, GPIO_PATH_67};
+	char trafficLight2Ports[3] = {GPIO_PATH_26, GPIO_PATH_46, GPIO_PATH_65};
     char buttonPorts[2][25] = {GPIO_PATH_66, GPIO_PATH_69};
 
     #ifdef DEBUG
