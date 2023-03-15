@@ -9,7 +9,7 @@
 #include <time.h>
 
 //comment out to live run
-#define DEBUG 1
+//#define DEBUG 1
 
 #define GPIO_PATH_44 "/sys/class/gpio/gpio44" //Green 1
 #define GPIO_PATH_68 "/sys/class/gpio/gpio68" //Yellow 1
