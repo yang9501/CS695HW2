@@ -33,7 +33,7 @@ static void setLightInitialState(char *greenPort, char *yellowPort, char *redPor
 //Primary light switch logic
 static void cycleLights(char *greenPort1, char *yellowPort1, char *redPort1, char *greenPort2, char *yellowPort2, char *redPort2);
 
-static void getButtonPressDuration(char *buttonPort);
+static void *getButtonPressDuration(char *buttonPort);
 
 void *print_message_function_1( void *ptr );
 
@@ -78,8 +78,8 @@ int main(void) {
 
     /* Create independent threads each of which will execute function */
 
-    buttonListener1 = pthread_create( &thread1, NULL, &getButtonPressDuration, (void*) buttonPorts[0]);
-    buttonListener2 = pthread_create( &thread2, NULL, &getButtonPressDuration, (void*) buttonPorts[1]);
+    buttonListener1 = pthread_create( &thread1, NULL, getButtonPressDuration, (void*) buttonPorts[0]);
+    buttonListener2 = pthread_create( &thread2, NULL, getButtonPressDuration, (void*) buttonPorts[1]);
     pthread_join( thread1, NULL);
     pthread_join( thread2, NULL);
 
@@ -102,7 +102,7 @@ void *print_message_function_2( void *ptr ) {
     sleep(2);
 }
 
-static void getButtonPressDuration(char *buttonPort) {
+static void *getButtonPressDuration(char *buttonPort) {
     //https://www.youtube.com/watch?v=b2_jS3ZMwtM
     //https://forum.beagleboard.org/t/reading-gpio-state-in-beagle-bone-black/1649
     //https://www.dummies.com/article/technology/computers/hardware/beaglebone/setting-beaglebone-gpios-as-inputs-144958/
