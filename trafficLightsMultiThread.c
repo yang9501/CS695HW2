@@ -86,6 +86,7 @@ void *print_message_function( void *ptr ) {
     char *message;
     message = (char *) ptr;
     printf("%s \n", message);
+    sleep(5);
 }
 
 static void getButtonPressDuration(char *buttonPort) {
