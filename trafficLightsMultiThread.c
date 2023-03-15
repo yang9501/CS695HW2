@@ -77,7 +77,7 @@ static void testButton(char *buttonPort1, char *buttonPort2) {
                 continue;
             }
             time_t heldLength = time(&end_time) - start_time;
-            printf("%d", seconds);
+            printf("%d", heldLength);
         }
     }
 }
