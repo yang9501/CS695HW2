@@ -125,8 +125,10 @@ void *cycleLights(void *trafficLightPortsPointer) {
     char* trafficLightPorts = trafficLightPortsPointer;
     #ifdef DEBUG
     (void) printf("Green1 on: %s\n", &trafficLightPorts[0]);
+    (void) printf("Red1 off: %s\n", &trafficLightPorts[2]);
     #else
     (void) writeLED("/value", &trafficLightPorts[0], "1");
+    (void) writeLED("/value", &trafficLightPorts[2], "0");
     #endif
 	
     sleep(10);
