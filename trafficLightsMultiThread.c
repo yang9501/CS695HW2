@@ -24,6 +24,9 @@
 
 //Writes specified value to specified GPIO directory
 static void writeLED(char *filename, char *port, char *value);
+
+static void readLED(char *filename, char *port);
+
 //Primary light switch logic
 static void cycleLights(char *greenPort1, char *yellowPort1, char *redPort1, char *greenPort2, char *yellowPort2, char *redPort2);
 
@@ -65,15 +68,9 @@ static void testButton(char *buttonPort1, char *buttonPort2) {
     //https://www.youtube.com/watch?v=b2_jS3ZMwtM
     //https://forum.beagleboard.org/t/reading-gpio-state-in-beagle-bone-black/1649
     //https://www.dummies.com/article/technology/computers/hardware/beaglebone/setting-beaglebone-gpios-as-inputs-144958/
-    FILE* fp; //create file pointer
-    char fullFileName[100]; //store path and filename
-    int val;
-    (void) sprintf(fullFileName, "%s%s", buttonPort1, "/direction"); //write path/name
-    fp = fopen(fullFileName, "r"); //open file for writing
+
     while(1) {
-        (void) fscanf(fp, "%d", &val);
-        (void) printf("%d", val);
-        if(val == 1) {
+        if(readLED("/value", buttonPort1) == 1) {
             (void) printf("PRESSED");
         }
     }
@@ -137,6 +134,17 @@ static void cycleLights(char *greenPort1, char *yellowPort1, char *redPort1, cha
     (void) writeLED("/value", yellowPort2, "0");
     (void) writeLED("/value", redPort1, "0");
     #endif
+}
+
+static void readLED(char *filename, char *port) {
+    FILE* fp; //create file pointer
+    char fullFileName[100]; //store path and filename
+    int val;
+    (void) sprintf(fullFileName, "%s%s", port, filename); //write path/name
+    fp = fopen(fullFileName, "r"); //open file for writing
+    (void) fscanf(fp, "%d", &val);
+    close(fp);
+    return val;
 }
 
 static void writeLED(char *filename, char *port, char *value) {
