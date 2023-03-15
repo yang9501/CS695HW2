@@ -39,6 +39,12 @@ int main(void) {
     //arrays containing GPIO port definitions, representing each of the two traffic lights
 	char trafficLight1Ports[3][25] = {GPIO_PATH_44, GPIO_PATH_68, GPIO_PATH_67};
 	char trafficLight2Ports[3][25] = {GPIO_PATH_26, GPIO_PATH_46, GPIO_PATH_65};
+    //char **trafficLight1Ports = malloc(3 * sizeof(char*));
+    //char **trafficLight2Ports = malloc(3 * sizeof(char*));
+    //for (int i = 0; i < 3; i++) {
+        //trafficLight1Ports[i] = malloc(25 * sizeof(char));
+        //trafficLight2Ports[i] = malloc(25 * sizeof(char));
+    //}
     char buttonPorts[2][25] = {GPIO_PATH_66, GPIO_PATH_69};
 
     #ifdef DEBUG
@@ -68,7 +74,7 @@ int main(void) {
     /* Create independent threads each of which will execute function */
     pthread_create( &thread1, NULL, getButtonPressDuration, (void*) buttonPorts[0]);
     pthread_create( &thread2, NULL, getButtonPressDuration, (void*) buttonPorts[1]);
-    pthread_create( &thread3, NULL, cycleLights, trafficLight1Ports);
+    pthread_create( &thread3, NULL, cycleLights, (void*) *trafficLight1Ports);
     pthread_join( thread1, NULL);
     pthread_join( thread2, NULL);
 
@@ -124,7 +130,6 @@ static void setLightInitialState(char *greenPort, char *yellowPort, char *redPor
 void *cycleLights(void *ptr) {
     char* trafficLightPorts;
     trafficLightPorts = (char *) ptr;
-    printf("%s", trafficLightPorts[2]);
     #ifdef DEBUG
     (void) printf("Green1 on: %s\n", trafficLightPorts[0]);
     (void) printf("Red1 off: %s\n", trafficLightPorts[2]);
