@@ -33,7 +33,9 @@ static void cycleLights(char *greenPort1, char *yellowPort1, char *redPort1, cha
 
 static void getButtonPressDuration(char *buttonPort);
 
-void *print_message_function( void *ptr, int x );
+void *print_message_function_1( void *ptr );
+
+void *print_message_function_2( void *ptr );
 
 int main(void) {
     //arrays containing GPIO port definitions, representing each of the two traffic lights
@@ -72,21 +74,29 @@ int main(void) {
 
     /* Create independent threads each of which will execute function */
 
-    iret1 = pthread_create( &thread1, NULL, print_message_function, (void*) message1, 2);
-    iret2 = pthread_create( &thread2, NULL, print_message_function, (void*) message2, 5);
+    iret1 = pthread_create( &thread1, NULL, print_message_function_1, (void*) message1);
+    iret2 = pthread_create( &thread2, NULL, print_message_function_2, (void*) message2);
     pthread_join( thread1, NULL);
     pthread_join( thread2, NULL);
     printf("Thread 1 returns: %d\n",iret1);
     printf("Thread 2 returns: %d\n",iret2);
 
+    printf("hello");
 	return 0;
 }
 
-void *print_message_function( void *ptr, int x ) {
+void *print_message_function_1( void *ptr ) {
     char *message;
     message = (char *) ptr;
     printf("%s \n", message);
-    sleep(x);
+    sleep(5);
+}
+
+void *print_message_function_2( void *ptr ) {
+    char *message;
+    message = (char *) ptr;
+    printf("%s \n", message);
+    sleep(2);
 }
 
 static void getButtonPressDuration(char *buttonPort) {
