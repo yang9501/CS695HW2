@@ -76,7 +76,7 @@ static void testButton(char *buttonPort1, char *buttonPort2) {
     while(1) {
         ledValue = readLED("/value", buttonPort1);
         if(ledValue == 1){
-            //printf("%d", pressedFlag);
+            printf("%d", pressedFlag);
             //first press detected
             if(pressedFlag == 0) {
                 printf("FIRST PRESSED");
