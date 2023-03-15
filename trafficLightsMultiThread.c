@@ -6,6 +6,7 @@
 #include <pthread.h>
 #include <sys/utsname.h>
 #include <stdint.h>
+#include <time.h>
 
 //comment out to live run
 #define DEBUG 1
@@ -63,18 +64,24 @@ int main(void) {
 static void testButton(char *buttonPort1, char *buttonPort2) {
     //https://www.youtube.com/watch?v=b2_jS3ZMwtM
     //https://forum.beagleboard.org/t/reading-gpio-state-in-beagle-bone-black/1649
+    //https://www.dummies.com/article/technology/computers/hardware/beaglebone/setting-beaglebone-gpios-as-inputs-144958/
     FILE* fp; //create file pointer
     char fullFileName[100]; //store path and filename
     int val;
+    (void) sprintf(fullFileName, "%s%s", port, filename); //write path/name
+    fp = fopen(fullFileName, "r"); //open file for writing
     while(1) {
-        (void) sprintf(fullFileName, "%s%s", port, filename); //write path/name
-        fp = fopen(fullFileName, "r"); //open file for writing
         (void) fscanf(f, "%d", &val);
-        (void) fclose(fp); //close the file using the file pointer
         if(val == 1) {
             (void) printf("PRESSED");
         }
     }
+    //time_t seconds;
+    // Stores time seconds
+    //time(&seconds);
+
+
+    (void) fclose(fp); //close the file using the file pointer
 }
 
 static void cycleLights(char *greenPort1, char *yellowPort1, char *redPort1, char *greenPort2, char *yellowPort2, char *redPort2) {
