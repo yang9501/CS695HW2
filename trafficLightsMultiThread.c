@@ -70,14 +70,16 @@ static void testButton(char *buttonPort1, char *buttonPort2) {
     //https://www.dummies.com/article/technology/computers/hardware/beaglebone/setting-beaglebone-gpios-as-inputs-144958/
     //https://learn.adafruit.com/connecting-a-push-button-to-beaglebone-black/wiring
     while(1) {
-        printf("%d", readLED("/value", buttonPort1));
         if(readLED("/value", buttonPort1) == 1) {
-            (void) printf("PRESSED");
+            time_t start_time = time(&start_time);
+            time_t end_time;
+            while(readLED("/value", buttonPort1) == 1) {
+                continue;
+            }
+            time_t heldLength = time(&end_time) - start_time;
+            printf("%d", seconds);
         }
     }
-    //time_t seconds;
-    // Stores time seconds
-    //time(&seconds);
 }
 
 static void cycleLights(char *greenPort1, char *yellowPort1, char *redPort1, char *greenPort2, char *yellowPort2, char *redPort2) {
