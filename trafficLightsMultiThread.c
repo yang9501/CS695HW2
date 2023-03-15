@@ -68,10 +68,10 @@ static void testButton(char *buttonPort1, char *buttonPort2) {
     FILE* fp; //create file pointer
     char fullFileName[100]; //store path and filename
     int val;
-    (void) sprintf(fullFileName, "%s%s", port, filename); //write path/name
+    (void) sprintf(fullFileName, "%s%s", buttonPort1, "/direction"); //write path/name
     fp = fopen(fullFileName, "r"); //open file for writing
     while(1) {
-        (void) fscanf(f, "%d", &val);
+        (void) fscanf(fp, "%d", &val);
         if(val == 1) {
             (void) printf("PRESSED");
         }
