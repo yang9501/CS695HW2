@@ -74,7 +74,7 @@ int main(void) {
     /* Create independent threads each of which will execute function */
     pthread_create( &thread1, NULL, getButtonPressDuration, (void*) buttonPorts[0]);
     pthread_create( &thread2, NULL, getButtonPressDuration, (void*) buttonPorts[1]);
-    pthread_create( &thread3, NULL, cycleLights, (void*) trafficLight1Ports);
+    pthread_create( &thread3, NULL, cycleLights, trafficLight1Ports);
     pthread_join( thread1, NULL);
     pthread_join( thread2, NULL);
 
