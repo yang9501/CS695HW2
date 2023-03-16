@@ -101,6 +101,14 @@ void *getButtonPressDuration(void *buttonPort) {
                 fflush( stdout );   //https://stackoverflow.com/questions/16870059/printf-not-printing-to-screen
                 pressedFlag = 1;
             }
+            else {
+                end_time = time(NULL);
+                if(((end_time - start_time) >= 5)) {
+                    printf("GREATER THAN 5");
+                    fflush( stdout );
+                    //SEND SIGNAL
+                }
+            }
         }
         if(gpioValue == 0) {
             //if the button is let go after being pressed
@@ -110,12 +118,6 @@ void *getButtonPressDuration(void *buttonPort) {
                 printf("Button press time: %ld", end_time - start_time);
                 fflush( stdout );
             }
-        }
-        end_time = time(NULL);
-        if((end_time - start_time) >= 5) {
-            printf("GREATER THAN 5");
-            fflush( stdout );
-            //SEND SIGNAL
         }
     }
 }
