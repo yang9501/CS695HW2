@@ -34,6 +34,8 @@ static void setLightInitialState(char *greenPort, char *yellowPort, char *redPor
 //Primary light switch logic
 void cycleTrafficLight1();
 
+void cycleTrafficLight2();
+
 void getButtonPressDuration(void *buttonPort);
 
 int main(void) {
