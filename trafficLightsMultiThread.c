@@ -79,11 +79,11 @@ int main(void) {
 //signal for interrupting traffic sequence
 void testSignal() {
     sleep(5);
-    kill()
+    //kill();
 }
 
 void testSignalHandler(int sig) {
-    signal(SIGSEGV, testSignalHandler) //reset signal
+    signal(SIGSEGV, testSignalHandler); //reset signal
     cycleTrafficLight1();
 }
 
