@@ -70,6 +70,7 @@ int main(void) {
     pthread_create( &thread1, NULL, (void*) getButtonPressDuration, (void*) buttonPorts[0]);
     pthread_create( &thread2, NULL, (void*) getButtonPressDuration, (void*) buttonPorts[1]);
     pthread_create( &thread3, NULL, (void *)cycleTrafficLight1, NULL);
+    pthread_create( &thread4, NULL, (void *)cycleTrafficLight2, NULL);
     pthread_join( thread1, NULL);
     pthread_join( thread2, NULL);
 
@@ -168,6 +169,36 @@ void cycleTrafficLight1() {
     #else
     (void) writeLED("/value", GPIO_PATH_68, "0");
     (void) writeLED("/value", GPIO_PATH_67, "1");
+    #endif
+}
+
+void cycleTrafficLight2() {
+    #ifdef DEBUG
+    (void) printf("Green1 on: %s\n", GPIO_PATH_26);
+    (void) printf("Red1 off: %s\n", GPIO_PATH_65);
+    #else
+    (void) writeLED("/value", GPIO_PATH_26, "1");
+    (void) writeLED("/value", GPIO_PATH_65, "0");
+    #endif
+
+    sleep(10);
+
+    #ifdef DEBUG
+    (void) printf("Green1 off: %s\n", GPIO_PATH_26);
+    (void) printf("Yellow1 on: %s\n", GPIO_PATH_46);
+    #else
+    (void) writeLED("/value", GPIO_PATH_26, "0");
+    (void) writeLED("/value", GPIO_PATH_46, "1");
+    #endif
+
+    sleep(5);
+
+    #ifdef DEBUG
+    (void) printf("Yellow1 off: %s\n", GPIO_PATH_46);
+    (void) printf("Red1 on: %s\n", GPIO_PATH_65);
+    #else
+    (void) writeLED("/value", GPIO_PATH_46, "0");
+    (void) writeLED("/value", GPIO_PATH_65, "1");
     #endif
 }
 
