@@ -7,6 +7,7 @@
 #include <sys/utsname.h>
 #include <stdint.h>
 #include <time.h>
+#include <signal.h>
 
 //comment out to live run
 //#define DEBUG 1
@@ -39,12 +40,6 @@ int main(void) {
     //arrays containing GPIO port definitions, representing each of the two traffic lights
 	char trafficLight1Ports[3][25] = {GPIO_PATH_44, GPIO_PATH_68, GPIO_PATH_67};
 	char trafficLight2Ports[3][25] = {GPIO_PATH_26, GPIO_PATH_46, GPIO_PATH_65};
-    //char **trafficLight1Ports = malloc(3 * sizeof(char*));
-    //char **trafficLight2Ports = malloc(3 * sizeof(char*));
-    //for (int i = 0; i < 3; i++) {
-        //trafficLight1Ports[i] = malloc(25 * sizeof(char));
-        //trafficLight2Ports[i] = malloc(25 * sizeof(char));
-    //}
     char buttonPorts[2][25] = {GPIO_PATH_66, GPIO_PATH_69};
 
     #ifdef DEBUG
@@ -81,6 +76,10 @@ int main(void) {
 	return 0;
 }
 
+void * testSignal() {
+
+}
+
 void *getButtonPressDuration(void *buttonPort) {
     //https://www.youtube.com/watch?v=b2_jS3ZMwtM
     //https://forum.beagleboard.org/t/reading-gpio-state-in-beagle-bone-black/1649
@@ -111,6 +110,12 @@ void *getButtonPressDuration(void *buttonPort) {
                 printf("Button press time: %ld", end_time - start_time);
                 fflush( stdout );
             }
+        }
+        end_time = time(NULL);
+        if((end_time - start_time) >= 5) {
+            printf("GREATER THAN 5");
+            fflush( stdout );
+            //SEND SIGNAL
         }
     }
 }
