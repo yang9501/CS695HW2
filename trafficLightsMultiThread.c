@@ -32,9 +32,9 @@ static int readGPIO(char *filename, char *port);
 static void setLightInitialState(char *greenPort, char *yellowPort, char *redPort);
 
 //Primary light switch logic
-void *cycleLights(void *trafficLightPorts);
+void cycleTrafficLight1();
 
-void *getButtonPressDuration(void *buttonPort);
+void getButtonPressDuration(void *buttonPort);
 
 int main(void) {
     //arrays containing GPIO port definitions, representing each of the two traffic lights
@@ -67,20 +67,27 @@ int main(void) {
     int buttonListener1, buttonListener2;
 
     /* Create independent threads each of which will execute function */
-    pthread_create( &thread1, NULL, getButtonPressDuration, (void*) buttonPorts[0]);
-    pthread_create( &thread2, NULL, getButtonPressDuration, (void*) buttonPorts[1]);
-    pthread_create( &thread3, NULL, cycleLights, trafficLight1Ports);
+    pthread_create( &thread1, NULL, (void*) getButtonPressDuration, (void*) buttonPorts[0]);
+    pthread_create( &thread2, NULL, (void*) getButtonPressDuration, (void*) buttonPorts[1]);
+    pthread_create( &thread3, NULL, cycleTrafficLight1, NULL);
     pthread_join( thread1, NULL);
     pthread_join( thread2, NULL);
 
 	return 0;
 }
-
-void * testSignal() {
-
+//signal for starting traffic sequence
+//signal for interrupting traffic sequence
+void testSignal() {
+    sleep(5);
+    kill()
 }
 
-void *getButtonPressDuration(void *buttonPort) {
+void testSignalHandler(int sig) {
+    signal(SIGSEGV, testSignalHandler) //reset signal
+    cycleTrafficLight1();
+}
+
+void getButtonPressDuration(void *buttonPort) {
     //https://www.youtube.com/watch?v=b2_jS3ZMwtM
     //https://forum.beagleboard.org/t/reading-gpio-state-in-beagle-bone-black/1649
     //https://www.dummies.com/article/technology/computers/hardware/beaglebone/setting-beaglebone-gpios-as-inputs-144958/
@@ -134,7 +141,7 @@ static void setLightInitialState(char *greenPort, char *yellowPort, char *redPor
     #endif
 }
 
-void *cycleLights(void *ptr) {
+void cycleTrafficLight1() {
     #ifdef DEBUG
     (void) printf("Green1 on: %s\n", GPIO_PATH_44);
     (void) printf("Red1 off: %s\n", GPIO_PATH_67);
