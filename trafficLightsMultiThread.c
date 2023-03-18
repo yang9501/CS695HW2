@@ -88,7 +88,7 @@ int main(void) {
     /* Create independent threads each of which will execute function */
     pthread_create( &thread1, NULL, (void*) getButtonPressDuration, (void*) buttonPorts[0]);
     pthread_create( &thread2, NULL, (void*) getButtonPressDuration, (void*) buttonPorts[1]);
-    printf("%s", trafficLight1Ports[1]);
+    printf("%s\n", trafficLight1Ports[1]);
     pthread_create( &thread3, NULL, (void *) testArgument, (void*) trafficLight1Ports);
     //pthread_create( &thread3, NULL, (void *) trafficLight1Thread, (void*) trafficLight1Ports);
     //pthread_create( &thread4, NULL, (void *) trafficLight2Thread, NULL);
@@ -100,7 +100,7 @@ int main(void) {
 }
 
 void testArgument(void* trafficPort) {
-    printf((char*)trafficPort);
+    printf("%s\n",(char*)trafficPort[1]);
 }
 
 void trafficLight1Thread() {
