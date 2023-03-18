@@ -25,7 +25,7 @@
 
 #define GREEN_LIGHT_TIME 10
 #define YELLOW_LIGHT_TIME 5
-#define BUTTON_PRESS_DURATION 2
+#define BUTTON_PRESS_DURATION 5
 
 //Writes specified value to specified GPIO directory
 static void writeLED(char *filename, char *port, char *value);
