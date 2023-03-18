@@ -90,8 +90,8 @@ int main(void) {
 
     pthread_create( &thread1, NULL, (void*) getButton1PressDuration, NULL);
     pthread_create( &thread2, NULL, (void*) getButton2PressDuration, NULL);
-    pthread_join(thread1);
-    pthread_join(thread2);
+    pthread_join(thread1, NULL);
+    pthread_join(thread2, NULL);
 	return 0;
 }
 
@@ -107,7 +107,7 @@ void testWait() {
     sigemptyset(&set);
     sigaddset(&set, SIGALRM);
     while(1) {
-        sigwait();
+        sigwait(&set);
         for(int i = 0; i < 5; i++) {
             printf("hello\n");
             fflush(stdout);
