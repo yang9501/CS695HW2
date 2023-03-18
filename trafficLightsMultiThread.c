@@ -227,7 +227,7 @@ void getButton2PressDuration() {
                 if(((end_time - start_time) >= 5)) {
                     //Send signal only once
                     if(signalSentFlag == 0) {
-                        pthread_kill(thread3, SIGHILL);
+                        pthread_kill(thread3, SIGILL);
                         signalSentFlag = 1;
                     }
                 }
