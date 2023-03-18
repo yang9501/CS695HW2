@@ -100,8 +100,8 @@ int main(void) {
 }
 
 void testArgument(void* trafficPort) {
-    char* trafficPortCast = (char*) trafficPort;
-    printf("%s\n",trafficPortCast[1]);
+    //char* trafficPortCast = (char*) trafficPort;
+    printf("%s\n",trafficPort[1]);
 }
 
 void trafficLight1Thread() {
