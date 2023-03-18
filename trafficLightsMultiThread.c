@@ -107,7 +107,8 @@ void testWait() {
     sigemptyset(&set);
     sigaddset(&set, SIGALRM);
     while(1) {
-        sigwait(&set);
+        int sig;
+        sigwait(&set, &sig);
         for(int i = 0; i < 5; i++) {
             printf("hello\n");
             fflush(stdout);
