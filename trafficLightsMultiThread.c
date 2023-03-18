@@ -113,7 +113,11 @@ void testWait() {
     sigaddset(&set, SIGALRM);
     while(1) {
         int sig;
+        printf("starting wait\n");
+        fflush(stdout)
         sigwait(&set, &sig);
+        printf("wait over\n");
+        fflush(stdout);
         for(int i = 0; i < 5; i++) {
             printf("hello\n");
             fflush(stdout);
