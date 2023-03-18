@@ -102,6 +102,7 @@ int main(void) {
 
     pthread_create( &thread1, NULL, (void*) testWait, NULL);
     pthread_create( &thread2, NULL, (void*) testSignalWaitSend, NULL);
+    pthread_kill(thread1, SIGALRM);
     pthread_join(thread1, NULL);
     pthread_join(thread2, NULL);
 	return 0;
