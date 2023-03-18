@@ -101,7 +101,7 @@ int main(void) {
 void testSignalWaitSend() {
     while(1) {
         sleep(4);
-        pthread_kill(thread2, SIGALRM);
+        pthread_kill(thread1, SIGALRM);
     }
 }
 
