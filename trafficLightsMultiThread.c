@@ -44,7 +44,7 @@ void getButtonPressDuration(void *buttonPort);
 void trafficLight1Thread();
 void trafficLight2Thread();
 
-void testArgument(void* trafficPort);
+void testArgument(char trafficLight1Ports[3][25]);
 
 pthread_t thread1, thread2, thread3, thread4;
 
