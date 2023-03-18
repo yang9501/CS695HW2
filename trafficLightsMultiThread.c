@@ -75,8 +75,8 @@ int main(void) {
     setLightInitialState(trafficLight2Ports[0], trafficLight2Ports[1], trafficLight2Ports[2]);
     signal(SIGILL, testHandler);
     /* Create independent threads each of which will execute function */
-    //pthread_create( &thread1, NULL, (void*) getButton1PressDuration, (void*) &thread4);
-    //pthread_create( &thread2, NULL, (void*) getButton2PressDuration, (void*) &thread3);
+    pthread_create( &thread1, NULL, (void*) getButton1PressDuration, (void*) &thread4);
+    pthread_create( &thread2, NULL, (void*) getButton2PressDuration, (void*) &thread3);
     pthread_create( &thread3, NULL, (void *) cycleTrafficLight1, NULL);
     pthread_create( &thread4, NULL, (void *) cycleTrafficLight2, NULL);
     //pthread_create( &thread4, NULL, (void *) testSendSignal, NULL);
