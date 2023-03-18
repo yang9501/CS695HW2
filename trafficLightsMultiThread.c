@@ -39,20 +39,12 @@ void trafficLight1Cycle();
 void trafficLight2Cycle();
 
 //Primary button press detection
-void getButton1PressDuration();
-void getButton2PressDuration();
+void getButtonPressDuration(void *buttonPort);
 
 void trafficLight1Thread();
 void trafficLight2Thread();
 
-void trafficLight1ToGreenPhase();
-void trafficLight1ToYellowPhase();
-
-void trafficLight2ToGreenPhase();
-void trafficLight2ToYellowPhase();
-
 pthread_t thread1, thread2, thread3, thread4;
-sigset_t trafficLight1Set, trafficLight2Set;
 
 pthread_mutex_t timerMutex;
 time_t startTime;
@@ -92,8 +84,8 @@ int main(void) {
     pthread_mutex_init(&timerMutex, NULL);
 
     /* Create independent threads each of which will execute function */
-    pthread_create( &thread1, NULL, (void*) getButton1PressDuration, NULL);
-    pthread_create( &thread2, NULL, (void*) getButton2PressDuration, NULL);
+    pthread_create( &thread1, NULL, (void*) getButton1PressDuration, (void*) buttonPorts[0]);
+    pthread_create( &thread2, NULL, (void*) getButton2PressDuration, (void*) buttonPorts[1]);
     pthread_create( &thread3, NULL, (void *) trafficLight1Thread, NULL);
     pthread_create( &thread4, NULL, (void *) trafficLight2Thread, NULL);
 
@@ -141,11 +133,6 @@ void trafficLight1Cycle() {
     (void) writeLED("/value", GPIO_PATH_67, "0");
     (void) writeLED("/value", GPIO_PATH_44, "1");
 
-    trafficLight1ToGreenPhase();
-    trafficLight1ToYellowPhase();
-}
-
-void trafficLight1ToGreenPhase() {
     while(1) {
         pthread_mutex_lock(&timerMutex);
         endTime = time(NULL);
@@ -158,9 +145,7 @@ void trafficLight1ToGreenPhase() {
             break;
         }
     }
-}
 
-void trafficLight1ToYellowPhase() {
     while(1) {
         endTime = time(NULL);
         pthread_mutex_lock(&timerMutex);
@@ -182,11 +167,6 @@ void trafficLight2Cycle() {
     (void) writeLED("/value", GPIO_PATH_65, "0");
     (void) writeLED("/value", GPIO_PATH_26, "1");
 
-    trafficLight2ToGreenPhase();
-    trafficLight2ToYellowPhase();
-}
-
-void trafficLight2ToGreenPhase() {
     while(1) {
         pthread_mutex_lock(&timerMutex);
         endTime = time(NULL);
@@ -196,12 +176,10 @@ void trafficLight2ToGreenPhase() {
             //if 10 seconds have elapsed since the light has turned green, turn green light off and yellow light on
             (void) writeLED("/value", GPIO_PATH_26, "0");
             (void) writeLED("/value", GPIO_PATH_46, "1");
-            return;
+            break;
         }
     }
-}
 
-void trafficLight2ToYellowPhase() {
     while(1) {
         endTime = time(NULL);
         pthread_mutex_lock(&timerMutex);
@@ -211,12 +189,12 @@ void trafficLight2ToYellowPhase() {
             //if 15 seconds have elapsed since the light has turned green, turn yellow light off and red light on
             (void) writeLED("/value", GPIO_PATH_46, "0");
             (void) writeLED("/value", GPIO_PATH_65, "1");
-            return;
+            break;
         }
     }
 }
 
-void getButton1PressDuration() {
+void getButtonPressDuration(void *buttonPort) {
     //https://www.youtube.com/watch?v=b2_jS3ZMwtM
     //https://forum.beagleboard.org/t/reading-gpio-state-in-beagle-bone-black/1649
     //https://www.dummies.com/article/technology/computers/hardware/beaglebone/setting-beaglebone-gpios-as-inputs-144958/
@@ -227,7 +205,7 @@ void getButton1PressDuration() {
     int signalSentFlag = 0;
     int gpioValue;
     while(1) {
-        gpioValue = readGPIO("/value", GPIO_PATH_66);
+        gpioValue = readGPIO("/value", (char *) buttonPort);
         if(gpioValue == 1){
             //first press detected
             if(pressedFlag == 0) {
@@ -247,52 +225,6 @@ void getButton1PressDuration() {
                             printf("New Start time: %ld\n", startTime);
                             fflush( stdout );
                         }
-                        pthread_mutex_unlock(&timerMutex);
-                        signalSentFlag = 1;
-                    }
-                }
-            }
-        }
-        if(gpioValue == 0) {
-            //if the button is let go after being pressed
-            if(pressedFlag == 1) {
-                end_time = time(NULL);
-                pressedFlag = 0;
-                signalSentFlag = 0;
-                printf("Button press time: %ld\n", end_time - start_time);
-                fflush( stdout );
-            }
-        }
-    }
-}
-
-void getButton2PressDuration() {
-    time_t start_time;
-    time_t end_time;
-    int pressedFlag = 0;
-    int signalSentFlag = 0;
-    int gpioValue;
-    while(1) {
-        gpioValue = readGPIO("/value", GPIO_PATH_69);
-        if(gpioValue == 1){
-            //first press detected
-            if(pressedFlag == 0) {
-                start_time = time(NULL);
-                fflush( stdout );
-                pressedFlag = 1;
-            }
-            else {
-                end_time = time(NULL);
-                if(((end_time - start_time) >= 5)) {
-                    //Send signal only once
-                    if(signalSentFlag == 0) {
-                        //ADD RED LIGHT CHECK
-                        pthread_mutex_lock(&timerMutex);
-                        printf("Old Start time: %ld\n", startTime);
-                        fflush( stdout );
-                        startTime = startTime - (GREEN_LIGHT_TIME + startTime - endTime);
-                        printf("New Start time: %ld\n", startTime);
-                        fflush( stdout );
                         pthread_mutex_unlock(&timerMutex);
                         signalSentFlag = 1;
                     }
