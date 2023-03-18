@@ -86,7 +86,7 @@ int main(void) {
     /* Create independent threads each of which will execute function */
     pthread_create( &thread1, NULL, (void*) getButtonPressDuration, (void*) buttonPorts[0]);
     pthread_create( &thread2, NULL, (void*) getButtonPressDuration, (void*) buttonPorts[1]);
-    pthread_create( &thread3, NULL, (void *) trafficLight1Thread, NULL);
+    pthread_create( &thread3, NULL, (void *) trafficLight1Thread, (void*) trafficLight1Ports);
     pthread_create( &thread4, NULL, (void *) trafficLight2Thread, NULL);
 
     pthread_join(thread3, NULL);
@@ -217,16 +217,34 @@ void getButtonPressDuration(void *buttonPort) {
                 if(((end_time - start_time) >= 5)) {
                     if(signalSentFlag == 0) {
                         //ADD RED LIGHT CHECK
-                        pthread_mutex_lock(&timerMutex);
-                        if(endTime - startTime < GREEN_LIGHT_TIME) {
-                            printf("Old Start time: %ld\n", startTime);
-                            fflush( stdout );
-                            startTime = startTime - (GREEN_LIGHT_TIME + startTime - endTime);
-                            printf("New Start time: %ld\n", startTime);
-                            fflush( stdout );
+                        if(strcmp((char*) buttonPort,  GPIO_PATH_66) == 0) {
+                            if(readGPIO("/value", GPIO_PATH_67) == 1) {
+                                pthread_mutex_lock(&timerMutex);
+                                if(endTime - startTime < GREEN_LIGHT_TIME) {
+                                    printf("Old Start time: %ld\n", startTime);
+                                    fflush( stdout );
+                                    startTime = startTime - (GREEN_LIGHT_TIME + startTime - endTime);
+                                    printf("New Start time: %ld\n", startTime);
+                                    fflush( stdout );
+                                }
+                                pthread_mutex_unlock(&timerMutex);
+                                signalSentFlag = 1;
+                            }
                         }
-                        pthread_mutex_unlock(&timerMutex);
-                        signalSentFlag = 1;
+                        if(strcmp((char*) buttonPort,  GPIO_PATH_69) == 0) {
+                            if(readGPIO("/value", GPIO_PATH_65) == 1) {
+                                pthread_mutex_lock(&timerMutex);
+                                if(endTime - startTime < GREEN_LIGHT_TIME) {
+                                    printf("Old Start time: %ld\n", startTime);
+                                    fflush( stdout );
+                                    startTime = startTime - (GREEN_LIGHT_TIME + startTime - endTime);
+                                    printf("New Start time: %ld\n", startTime);
+                                    fflush( stdout );
+                                }
+                                pthread_mutex_unlock(&timerMutex);
+                                signalSentFlag = 1;
+                            }
+                        }
                     }
                 }
             }
