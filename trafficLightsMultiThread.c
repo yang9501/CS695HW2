@@ -44,6 +44,8 @@ void getButtonPressDuration(void *buttonPort);
 void trafficLight1Thread();
 void trafficLight2Thread();
 
+void testArgument(void* trafficPort);
+
 pthread_t thread1, thread2, thread3, thread4;
 
 pthread_mutex_t timerMutex;
@@ -87,6 +89,7 @@ int main(void) {
     pthread_create( &thread1, NULL, (void*) getButtonPressDuration, (void*) buttonPorts[0]);
     pthread_create( &thread2, NULL, (void*) getButtonPressDuration, (void*) buttonPorts[1]);
     printf("%s", trafficLight1Ports[1]);
+    pthread_create( &thread3, NULL, (void *) testArgument, (void*) trafficLight1Ports);
     //pthread_create( &thread3, NULL, (void *) trafficLight1Thread, (void*) trafficLight1Ports);
     //pthread_create( &thread4, NULL, (void *) trafficLight2Thread, NULL);
 
