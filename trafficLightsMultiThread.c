@@ -97,7 +97,7 @@ int main(void) {
     pthread_create( &thread3, NULL, (void *) cycleTrafficLight1, NULL);
     pthread_create( &thread4, NULL, (void *) cycleTrafficLight2, NULL);
     sleep(1);
-    pthread_kill(thread1, SIGALRM);
+    pthread_kill(thread3, SIGALRM);
 
     pthread_join(thread3, NULL);
     pthread_join(thread4, NULL);
