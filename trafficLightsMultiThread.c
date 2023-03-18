@@ -101,7 +101,7 @@ int main(void) {
 
 void testArgument(char trafficLight1Ports[3][25]) {
     printf("hello\n");
-    printf("%s\n",trafficLight1Ports[1]);
+    printf("%s\n",trafficLight1Ports[2]);
 }
 
 void trafficLight1Thread() {
