@@ -165,7 +165,7 @@ void trafficLight1ToYellowPhase() {
         pthread_mutex_lock(&timerMutex);
         time_t runTime = endTime - start_time;
         pthread_mutex_unlock(&timerMutex);
-        if (runTime >= YELLOW_LIGHT_TIME) {
+        if (runTime >= YELLOW_LIGHT_TIME + GREEN_LIGHT_TIME) {
             //if 10 seconds have elapsed since the light has turned green, turn green light off and yellow light on
             (void) writeLED("/value", GPIO_PATH_68, "0");
             (void) writeLED("/value", GPIO_PATH_67, "1");
@@ -205,7 +205,7 @@ void trafficLight2ToYellowPhase() {
         pthread_mutex_lock(&timerMutex);
         time_t runTime = endTime - start_time;
         pthread_mutex_unlock(&timerMutex);
-        if (runTime >= YELLOW_LIGHT_TIME) {
+        if (runTime >= YELLOW_LIGHT_TIME + GREEN_LIGHT_TIME) {
             //if 10 seconds have elapsed since the light has turned green, turn green light off and yellow light on
             (void) writeLED("/value", GPIO_PATH_46, "0");
             (void) writeLED("/value", GPIO_PATH_65, "1");
