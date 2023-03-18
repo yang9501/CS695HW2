@@ -225,11 +225,9 @@ void getButton2PressDuration() {
             else {
                 end_time = time(NULL);
                 if(((end_time - start_time) >= 5)) {
-                    printf("GREATER THAN 5\n");
-                    fflush( stdout );
                     //Send signal only once
                     if(signalSentFlag == 0) {
-                        pthread_kill(thread1, SIGHUP);
+                        pthread_kill(thread3, SIGHILL);
                         signalSentFlag = 1;
                     }
                 }
