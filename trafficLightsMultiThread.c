@@ -10,7 +10,7 @@
 #include <signal.h>
 
 //comment out to live run
-//#define DEBUG 1
+#define DEBUG 1
 
 #define GPIO_PATH_44 "/sys/class/gpio/gpio44" //Green 1
 #define GPIO_PATH_68 "/sys/class/gpio/gpio68" //Yellow 1
@@ -84,6 +84,7 @@ int main(void) {
 
     /* Create independent threads each of which will execute function */
     #ifdef DEBUG
+    //Since the button/interrupt functionality depends on GPIO input, disable it during debug mode
     pthread_create( &thread3, NULL, (void *) trafficLight1Thread, trafficLight1Ports);
     pthread_create( &thread4, NULL, (void *) trafficLight2Thread, trafficLight2Ports);
     #else
@@ -202,12 +203,10 @@ void getButtonPressDuration(void *buttonPort) {
                         if(strcmp((char*) buttonPort,  GPIO_PATH_66) == 0) {
                             if(readGPIO("/value", GPIO_PATH_67) == 1) {
                                 pthread_mutex_lock(&timerMutex);
+                                //If the light has been cycling for less time than the green light time(the light is currently green), then allow the interrupt
                                 if(endTime - startTime < GREEN_LIGHT_TIME) {
-                                    printf("Old Start time: %ld\n", startTime);
-                                    fflush( stdout );
+                                    //Manually adjust the start time to trick the main logic loop to think it's time to end the light cycle
                                     startTime = startTime - (GREEN_LIGHT_TIME + startTime - endTime);
-                                    printf("New Start time: %ld\n", startTime);
-                                    fflush( stdout );
                                 }
                                 pthread_mutex_unlock(&timerMutex);
                                 signalSentFlag = 1;
@@ -217,12 +216,10 @@ void getButtonPressDuration(void *buttonPort) {
                         if(strcmp((char*) buttonPort,  GPIO_PATH_69) == 0) {
                             if(readGPIO("/value", GPIO_PATH_65) == 1) {
                                 pthread_mutex_lock(&timerMutex);
+                                //If the light has been cycling for less time than the green light time(the light is currently green), then allow the interrupt
                                 if(endTime - startTime < GREEN_LIGHT_TIME) {
-                                    printf("Old Start time: %ld\n", startTime);
-                                    fflush( stdout );
+                                    //Manually adjust the start time to trick the main logic loop to think it's time to end the light cycle
                                     startTime = startTime - (GREEN_LIGHT_TIME + startTime - endTime);
-                                    printf("New Start time: %ld\n", startTime);
-                                    fflush( stdout );
                                 }
                                 pthread_mutex_unlock(&timerMutex);
                                 signalSentFlag = 1;
@@ -238,8 +235,6 @@ void getButtonPressDuration(void *buttonPort) {
                 end_time = time(NULL);
                 pressedFlag = 0;
                 signalSentFlag = 0;
-                printf("Button press time: %ld\n", end_time - start_time);
-                fflush( stdout );
             }
         }
     }
