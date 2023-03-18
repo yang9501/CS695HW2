@@ -110,7 +110,7 @@ void testSignalWaitSend() {
 void testWait() {
     sigset_t set;
     sigemptyset(&set);
-    sigaddset(&set, SIGALRM);
+    sigaddset(&set, SIGBUS);
     while(1) {
         int sig;
         printf("starting wait\n");
