@@ -254,8 +254,8 @@ void getButton1PressDuration() {
                     if(signalSentFlag == 0) {
                         //I NEED TO MANIPULATE TIMER
                         pthread_mutex_lock(&timerMutex);
-                        if(startTime < GREEN_LIGHT_TIME) {
-                            startTime = endTime - (GREEN_LIGHT_TIME + YELLOW_LIGHT_TIME);
+                        if(endTime - startTime < GREEN_LIGHT_TIME) {
+                            startTime = startTime - (GREEN_LIGHT_TIME + YELLOW_LIGHT_TIME);
                         }
                         pthread_mutex_unlock(&timerMutex);
                     }
@@ -297,8 +297,8 @@ void getButton2PressDuration() {
                     if(signalSentFlag == 0) {
                         //I NEED TO MANIPULATE TIMER
                         pthread_mutex_lock(&timerMutex);
-                        if(startTime < GREEN_LIGHT_TIME) {
-                            startTime = endTime - (GREEN_LIGHT_TIME + YELLOW_LIGHT_TIME);
+                        if(endTime - startTime < GREEN_LIGHT_TIME) {
+                            startTime = startTime - (GREEN_LIGHT_TIME + YELLOW_LIGHT_TIME);
                         }
                         pthread_mutex_unlock(&timerMutex);
                     }
