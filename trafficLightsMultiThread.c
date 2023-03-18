@@ -101,8 +101,6 @@ int main(void) {
 void testSignalWaitSend() {
     while(1) {
         sleep(4);
-        printf("Sending signal...");
-        fflush(stdout);
         pthread_kill(thread2, SIGALRM);
     }
 }
@@ -110,14 +108,12 @@ void testSignalWaitSend() {
 void testWait() {
     sigset_t set;
     sigemptyset(&set);
-    sigaddset(&set, SIGBUS);
+    sigaddset(&set, SIGALRM);
     while(1) {
         int sig;
         printf("starting wait\n");
         fflush(stdout);
         sigwait(&set, &sig);
-        printf("wait over\n");
-        fflush(stdout);
         for(int i = 0; i < 5; i++) {
             printf("hello\n");
             fflush(stdout);
