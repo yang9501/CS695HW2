@@ -96,7 +96,7 @@ int main(void) {
     pthread_create( &thread2, NULL, (void*) getButton2PressDuration, NULL);
     pthread_create( &thread3, NULL, (void *) cycleTrafficLight1, NULL);
     pthread_create( &thread4, NULL, (void *) cycleTrafficLight2, NULL);
-
+    sleep(1);
     pthread_kill(thread1, SIGALRM);
 
     pthread_join(thread3, NULL);
