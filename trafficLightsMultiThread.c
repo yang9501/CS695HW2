@@ -50,7 +50,7 @@ void testSignalWaitSend();
 void testWait();
 
 pthread_t thread1, thread2, thread3, thread4;
-sigset_t set;
+sigset_t trafficLight1Set, trafficLight2Set;
 
 int main(void) {
     //arrays containing GPIO port definitions, representing each of the two traffic lights
@@ -83,6 +83,14 @@ int main(void) {
     //signal(SIGILL, trafficLight1InterruptHandler);
     //signal(SIGHUP, trafficLight2InterruptHandler);
 
+    //Set conditions for trafficLight sigwait
+    sigemptyset(&trafficLight1Set);
+    sigemptyset(&trafficLight2Set);
+    sigaddset(&trafficLight1Set, SIGALRM);
+    sigaddset(&trafficLight2Set, SIGBUS);
+    pthread_sigmask(SIG_BLOCK, &trafficLight1Set, 0);
+    pthread_sigmask(SIG_BLOCK, &trafficLight2Set, 0);
+
     /* Create independent threads each of which will execute function */
     //pthread_create( &thread1, NULL, (void*) getButton1PressDuration, NULL);
     //pthread_create( &thread2, NULL, (void*) getButton2PressDuration, NULL);
@@ -91,10 +99,6 @@ int main(void) {
 
     //pthread_join(thread3, NULL);
     //pthread_join(thread4, NULL);
-
-    sigemptyset(&set);
-    sigaddset(&set, SIGALRM);
-    pthread_sigmask(SIG_BLOCK, &set, 0);
 
     pthread_create( &thread1, NULL, (void*) testWait, NULL);
     pthread_create( &thread2, NULL, (void*) testSignalWaitSend, NULL);
@@ -113,7 +117,7 @@ void testSignalWaitSend() {
 void testWait() {
     while(1) {
         int sig;
-        sigwait(&set, &sig);
+        sigwait(&trafficLight1Set, &sig);
         for(int i = 0; i < 5; i++) {
             printf("hello\n");
             fflush(stdout);
@@ -257,8 +261,9 @@ static void setLightInitialState(char *greenPort, char *yellowPort, char *redPor
 void cycleTrafficLight1() {
     time_t startTime,endTime;
     int colorTimerFlag = 0;
+    int sig;
     while(1) {
-        //INSERT SIGNAL WAIT HERE, CYCLING BEGINS UPON SIGALRM.  DO WE NEED TO "RESET" SIGWAIT() AFTER STARTING THE THREAD?
+        sigwait(&trafficLight1Set, &sig);
         if (readGPIO("/value", GPIO_PATH_67)) { //If light is currently Red
             //Turn red off, turn green on
             (void) writeLED("/value", GPIO_PATH_67, "0");
@@ -304,8 +309,9 @@ void cycleTrafficLight1() {
 void cycleTrafficLight2() {
     time_t startTime,endTime;
     int colorTimerFlag = 0;
+    int sig;
     while(1) {
-        //INSERT SIGNAL WAIT HERE, CYCLING BEGINS UPON SIGBUS
+        sigwait(&trafficLight2Set, &sig);
         if (readGPIO("/value", GPIO_PATH_65)) { //If light is currently Red
             //Turn red off, turn green on
             (void) writeLED("/value", GPIO_PATH_65, "0");
@@ -341,7 +347,7 @@ void cycleTrafficLight2() {
                     (void) writeLED("/value", GPIO_PATH_46, "0");
                     (void) writeLED("/value", GPIO_PATH_65, "1");
                     //SEND SIGNAL TO OTHER TRAFFIC LIGHT THREAD
-                    pthread_kill(thread4, SIGBUS);
+                    pthread_kill(thread4, SIGALRM);
                 }
             }
         }
