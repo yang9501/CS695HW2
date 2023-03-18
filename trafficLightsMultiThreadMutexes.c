@@ -89,8 +89,8 @@ int main(void) {
     setLightInitialState(trafficLight1Ports[0], trafficLight1Ports[1], trafficLight1Ports[2]);
     setLightInitialState(trafficLight2Ports[0], trafficLight2Ports[1], trafficLight2Ports[2]);
 
-    pthread_mutex_init(&batonMutex, NULL)
-    pthread_mutex_init(&timerMutex, NULL)
+    pthread_mutex_init(&batonMutex, NULL);
+    pthread_mutex_init(&timerMutex, NULL);
 
     /* Create independent threads each of which will execute function */
     pthread_create( &thread1, NULL, (void*) getButton1PressDuration, NULL);
