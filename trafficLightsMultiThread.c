@@ -25,6 +25,7 @@
 
 #define GREEN_LIGHT_TIME 10
 #define YELLOW_LIGHT_TIME 5
+#define BUTTON_PRESS_DURATION 5
 
 //Writes specified value to specified GPIO directory
 static void writeLED(char *filename, char *port, char *value);
@@ -49,11 +50,12 @@ pthread_mutex_t timerMutex;
 time_t startTime;
 time_t endTime;
 
+//Baton represents the flow of control between traffic lights
 pthread_mutex_t batonMutex;
 int baton = 0;
 
 int main(void) {
-    //arrays containing GPIO port definitions, representing each of the two traffic lights
+    //arrays containing GPIO port definitions, representing each of the two traffic lights and the button inputs
 	char trafficLight1Ports[3][25] = {GPIO_PATH_44, GPIO_PATH_68, GPIO_PATH_67};
 	char trafficLight2Ports[3][25] = {GPIO_PATH_26, GPIO_PATH_46, GPIO_PATH_65};
     char buttonPorts[2][25] = {GPIO_PATH_66, GPIO_PATH_69};
@@ -76,6 +78,7 @@ int main(void) {
     }
     #endif
 
+    //Initialize GPIO port values
     setLightInitialState(trafficLight1Ports[0], trafficLight1Ports[1], trafficLight1Ports[2]);
     setLightInitialState(trafficLight2Ports[0], trafficLight2Ports[1], trafficLight2Ports[2]);
 
@@ -160,7 +163,7 @@ void trafficLightCycle(char trafficLightPorts[3][25]) {
         time_t runTime = endTime - startTime;
         pthread_mutex_unlock(&timerMutex);
         if (runTime >= GREEN_LIGHT_TIME) {
-            //if 10 seconds have elapsed since the light has turned green, turn green light off and yellow light on
+            //if GREEN_LIGHT_TIME seconds have elapsed since the cycle was initiated, turn green light off and yellow light on
             #ifdef DEBUG
             (void) printf("Green off: %s\n", trafficLightPorts[0]);
             (void) printf("Yellow on: %s\n", trafficLightPorts[1]);
@@ -178,7 +181,7 @@ void trafficLightCycle(char trafficLightPorts[3][25]) {
         time_t runTime = endTime - startTime;
         pthread_mutex_unlock(&timerMutex);
         if (runTime >= YELLOW_LIGHT_TIME + GREEN_LIGHT_TIME) {
-            //if 15 seconds have elapsed since the light has turned green, turn yellow light off and red light on
+            //if YELLOW_LIGHT_TIME + GREEN_LIGHT_TIME seconds have elapsed since the cycle was initiated, turn yellow light off and red light on
             #ifdef DEBUG
             (void) printf("Yellow off: %s\n", trafficLightPorts[1]);
             (void) printf("Red on: %s\n", trafficLightPorts[2]);
@@ -207,7 +210,7 @@ void getButtonPressDuration(void *buttonPort) {
             }
             else {
                 end_time = time(NULL);
-                if(((end_time - start_time) >= 5)) {
+                if(((end_time - start_time) >= BUTTON_PRESS_DURATION)) {
                     if(signalSentFlag == 0) {
                         //If the buttonPort corresponds with trafficLight1, and trafficLight1 is red, then allow the interrupt
                         if(strcmp((char*) buttonPort,  GPIO_PATH_66) == 0) {
