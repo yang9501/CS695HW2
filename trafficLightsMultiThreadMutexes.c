@@ -141,19 +141,29 @@ void testTrafficLight2() {
 void trafficLight1Cycle() {
     (void) writeLED("/value", GPIO_PATH_67, "0");
     (void) writeLED("/value", GPIO_PATH_44, "1");
+    pthread_mutex_lock(&timerMutex);
+    start_time = time(NULL);
+    pthread_mutex_unlock(&timerMutex);
     sleep(GREEN_LIGHT_TIME);
     (void) writeLED("/value", GPIO_PATH_44, "0");
     (void) writeLED("/value", GPIO_PATH_68, "1");
     sleep(YELLOW_LIGHT_TIME);
+    (void) writeLED("/value", GPIO_PATH_68, "0");
+    (void) writeLED("/value", GPIO_PATH_67, "1");
 }
 
 void trafficLight2Cycle() {
     (void) writeLED("/value", GPIO_PATH_65, "0");
     (void) writeLED("/value", GPIO_PATH_26, "1");
+    pthread_mutex_lock(&timerMutex);
+    start_time = time(NULL);
+    pthread_mutex_unlock(&timerMutex);
     sleep(GREEN_LIGHT_TIME);
     (void) writeLED("/value", GPIO_PATH_26, "0");
     (void) writeLED("/value", GPIO_PATH_46, "1");
     sleep(YELLOW_LIGHT_TIME);
+    (void) writeLED("/value", GPIO_PATH_46, "0");
+    (void) writeLED("/value", GPIO_PATH_65, "1");
 }
 
 //SIGILL: TrafficLight1's signal to be interrupted and set to red
