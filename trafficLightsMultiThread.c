@@ -88,9 +88,6 @@ int main(void) {
     pthread_create( &thread3, NULL, (void *) trafficLight1Thread, trafficLight1Ports);
     pthread_create( &thread4, NULL, (void *) trafficLight2Thread, trafficLight2Ports);
 
-    //TEST
-    //pthread_create( &thread3, NULL, (void *) testArgument, trafficLight1Ports);
-
     pthread_join(thread3, NULL);
     pthread_join(thread4, NULL);
 
@@ -133,8 +130,13 @@ void trafficLightCycle(char trafficLightPorts[3][25]) {
     pthread_mutex_lock(&timerMutex);
     startTime = time(NULL);
     pthread_mutex_unlock(&timerMutex);
+    #ifdef DEBUG
+    (void) printf("Red off: %s\n", trafficLightPorts[2]);
+    (void) printf("Green on: %s\n", trafficLightPorts[0]);
+    #else
     (void) writeLED("/value", trafficLightPorts[2], "0");
     (void) writeLED("/value", trafficLightPorts[0], "1");
+    #endif
 
     while(1) {
         pthread_mutex_lock(&timerMutex);
@@ -143,8 +145,13 @@ void trafficLightCycle(char trafficLightPorts[3][25]) {
         pthread_mutex_unlock(&timerMutex);
         if (runTime >= GREEN_LIGHT_TIME) {
             //if 10 seconds have elapsed since the light has turned green, turn green light off and yellow light on
+            #ifdef DEBUG
+            (void) printf("Green off: %s\n", trafficLightPorts[0]);
+            (void) printf("Yellow on: %s\n", trafficLightPorts[1]);
+            #else
             (void) writeLED("/value", trafficLightPorts[0], "0");
             (void) writeLED("/value", trafficLightPorts[1], "1");
+            #endif
             break;
         }
     }
@@ -156,18 +163,19 @@ void trafficLightCycle(char trafficLightPorts[3][25]) {
         pthread_mutex_unlock(&timerMutex);
         if (runTime >= YELLOW_LIGHT_TIME + GREEN_LIGHT_TIME) {
             //if 15 seconds have elapsed since the light has turned green, turn yellow light off and red light on
+            #ifdef DEBUG
+            (void) printf("Yellow off: %s\n", trafficLightPorts[1]);
+            (void) printf("Red on: %s\n", trafficLightPorts[2]);
+            #else
             (void) writeLED("/value", trafficLightPorts[1], "0");
             (void) writeLED("/value", trafficLightPorts[2], "1");
+            #endif
             break;
         }
     }
 }
 
 void getButtonPressDuration(void *buttonPort) {
-    //https://www.youtube.com/watch?v=b2_jS3ZMwtM
-    //https://forum.beagleboard.org/t/reading-gpio-state-in-beagle-bone-black/1649
-    //https://www.dummies.com/article/technology/computers/hardware/beaglebone/setting-beaglebone-gpios-as-inputs-144958/
-    //https://learn.adafruit.com/connecting-a-push-button-to-beaglebone-black/wiring
     time_t start_time;
     time_t end_time;
     int pressedFlag = 0;
