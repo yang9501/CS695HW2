@@ -84,8 +84,8 @@ int main(void) {
     pthread_mutex_init(&timerMutex, NULL);
 
     /* Create independent threads each of which will execute function */
-    pthread_create( &thread1, NULL, (void*) getButton1PressDuration, (void*) buttonPorts[0]);
-    pthread_create( &thread2, NULL, (void*) getButton2PressDuration, (void*) buttonPorts[1]);
+    pthread_create( &thread1, NULL, (void*) getButtonPressDuration, (void*) buttonPorts[0]);
+    pthread_create( &thread2, NULL, (void*) getButtonPressDuration, (void*) buttonPorts[1]);
     pthread_create( &thread3, NULL, (void *) trafficLight1Thread, NULL);
     pthread_create( &thread4, NULL, (void *) trafficLight2Thread, NULL);
 
