@@ -107,7 +107,6 @@ void testSignalWaitSend() {
     while(1) {
         sleep(4);
         pthread_kill(thread1, SIGALRM);
-        sleep(1);
     }
 }
 
