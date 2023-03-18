@@ -129,10 +129,10 @@ void getButton1PressDuration(void *trafficLight1ThreadId) {
             else {
                 end_time = time(NULL);
                 if(((end_time - start_time) >= 5)) {
-                    printf("GREATER THAN 5");
+                    printf("GREATER THAN 5\n");
                     fflush( stdout );
                     //SEND SIGINT SIGNAL
-                    //pthread_kill((pthread*) trafficLight1ThreadId, SIGINT);
+                    pthread_kill(thread3, SIGILL);
                 }
             }
         }
@@ -141,7 +141,7 @@ void getButton1PressDuration(void *trafficLight1ThreadId) {
             if(pressedFlag == 1) {
                 end_time = time(NULL);
                 pressedFlag = 0;
-                printf("Button press time: %ld", end_time - start_time);
+                printf("Button press time: %ld\n", end_time - start_time);
                 fflush( stdout );
             }
         }
@@ -165,7 +165,7 @@ void getButton2PressDuration(void *trafficLight2ThreadId) {
             else {
                 end_time = time(NULL);
                 if(((end_time - start_time) >= 5)) {
-                    printf("GREATER THAN 5");
+                    printf("GREATER THAN 5\n");
                     fflush( stdout );
                     //SEND SIGINT SIGNAL
                     //pthread_kill((pthread *)trafficLight2ThreadId, SIGINT);
@@ -177,7 +177,7 @@ void getButton2PressDuration(void *trafficLight2ThreadId) {
             if(pressedFlag == 1) {
                 end_time = time(NULL);
                 pressedFlag = 0;
-                printf("Button press time: %ld", end_time - start_time);
+                printf("Button press time: %ld\n", end_time - start_time);
                 fflush( stdout );
             }
         }
