@@ -35,22 +35,21 @@ static int readGPIO(char *filename, char *port);
 static void setLightInitialState(char *greenPort, char *yellowPort, char *redPort);
 
 //Primary light switch logic
-void cycleTrafficLight1();
-void cycleTrafficLight2();
+void trafficLight1Cycle();
+void trafficLight2Cycle();
 
 //Primary button press detection
 void getButton1PressDuration();
 void getButton2PressDuration();
 
-//Signal handlers for hot-swapping light cycling via button press interrupts
-void trafficLight1InterruptHandler();
-void trafficLight2InterruptHandler();
+void trafficLight1Thread();
+void trafficLight2Thread();
 
-void testTrafficLight1();
-void testTrafficLight2();
+void trafficLight1ToGreenPhase();
+void trafficLight1ToYellowPhase();
 
-void trafficLight1Cycle();
-void trafficLight2Cycle();
+void trafficLight2ToGreenPhase();
+void trafficLight2ToYellowPhase();
 
 pthread_t thread1, thread2, thread3, thread4;
 sigset_t trafficLight1Set, trafficLight2Set;
@@ -95,9 +94,6 @@ int main(void) {
     /* Create independent threads each of which will execute function */
     pthread_create( &thread1, NULL, (void*) getButton1PressDuration, NULL);
     pthread_create( &thread2, NULL, (void*) getButton2PressDuration, NULL);
-    //pthread_create( &thread3, NULL, (void *) test, NULL);
-    //pthread_create( &thread4, NULL, (void *) cycleTrafficLight2, NULL);
-
     pthread_create( &thread3, NULL, (void *) testTrafficLight1, NULL);
     pthread_create( &thread4, NULL, (void *) testTrafficLight2, NULL);
 
@@ -107,7 +103,7 @@ int main(void) {
 	return 0;
 }
 
-void testTrafficLight1() {
+void trafficLight1Thread() {
     while(1) {
         //If it's traffic light 1's turn
         if(baton == 0) {
@@ -123,7 +119,7 @@ void testTrafficLight1() {
     }
 }
 
-void testTrafficLight2() {
+void trafficLight2Thread() {
     while(1) {
         //If it's traffic light 1's turn
         if(baton == 0) {
@@ -144,12 +140,38 @@ void trafficLight1Cycle() {
     pthread_mutex_lock(&timerMutex);
     start_time = time(NULL);
     pthread_mutex_unlock(&timerMutex);
-    sleep(GREEN_LIGHT_TIME);
-    (void) writeLED("/value", GPIO_PATH_44, "0");
-    (void) writeLED("/value", GPIO_PATH_68, "1");
-    sleep(YELLOW_LIGHT_TIME);
-    (void) writeLED("/value", GPIO_PATH_68, "0");
-    (void) writeLED("/value", GPIO_PATH_67, "1");
+    trafficLight1ToGreenPhase();
+    trafficLight1ToYellowPhase();
+}
+
+void trafficLight1ToGreenPhase() {
+    while(1) {
+        endTime = time(NULL);
+        pthread_mutex_lock(&timerMutex);
+        time_t runTime = endTime - start_time;
+        pthread_mutex_unlock(&timerMutex);
+        if (runTime >= GREEN_LIGHT_TIME) {
+            //if 10 seconds have elapsed since the light has turned green, turn green light off and yellow light on
+            (void) writeLED("/value", GPIO_PATH_44, "0");
+            (void) writeLED("/value", GPIO_PATH_68, "1");
+            break;
+        }
+    }
+}
+
+void trafficLight1ToYellowPhase() {
+    while(1) {
+        endTime = time(NULL);
+        pthread_mutex_lock(&timerMutex);
+        time_t runTime = endTime - start_time;
+        pthread_mutex_unlock(&timerMutex);
+        if (runTime >= YELLOW_LIGHT_TIME) {
+            //if 10 seconds have elapsed since the light has turned green, turn green light off and yellow light on
+            (void) writeLED("/value", GPIO_PATH_68, "0");
+            (void) writeLED("/value", GPIO_PATH_67, "1");
+            break;
+        }
+    }
 }
 
 void trafficLight2Cycle() {
@@ -158,44 +180,38 @@ void trafficLight2Cycle() {
     pthread_mutex_lock(&timerMutex);
     start_time = time(NULL);
     pthread_mutex_unlock(&timerMutex);
-    sleep(GREEN_LIGHT_TIME);
-    (void) writeLED("/value", GPIO_PATH_26, "0");
-    (void) writeLED("/value", GPIO_PATH_46, "1");
-    sleep(YELLOW_LIGHT_TIME);
-    (void) writeLED("/value", GPIO_PATH_46, "0");
-    (void) writeLED("/value", GPIO_PATH_65, "1");
+    trafficLight2ToGreenPhase();
+    trafficLight2ToYellowPhase();
 }
 
-//SIGILL: TrafficLight1's signal to be interrupted and set to red
-//SIGALRM: TrafficLight1's signal to start cycling
-
-//SIGHUP: TrafficLight2's signal to be interrupted and set to red
-//SIGBUS: TrafficLight2's signal to start cycling
-
-
-//TODO: ***********************************************************************************************************************
-//1. Which light begins first? Start the sequence in the main() function by sending a SIGALRM signal to get the ball rolling.
-//2. Implement sigwait() within the trafficlight cycling code to make the lights wait to receive a signal to cycle
-//3. Figure out how to implement DEBUG MODE
-//4. Refactor the code by passing if arguments instead of hardcoding all the ports
-//*****************************************************************************************************************************
-
-//Button2 tells trafficLight1 that trafficLight2 needs to start cycling immediately
-void trafficLight1InterruptHandler() {
-    //Set trafficLight1 to Red
-    setLightInitialState(GPIO_PATH_44, GPIO_PATH_68, GPIO_PATH_67);
-    signal(SIGILL, trafficLight1InterruptHandler);
-    //Tell opposite light to start cycling
-    pthread_kill(thread4, SIGBUS);
+void trafficLight2ToGreenPhase() {
+    while(1) {
+        endTime = time(NULL);
+        pthread_mutex_lock(&timerMutex);
+        time_t runTime = endTime - start_time;
+        pthread_mutex_unlock(&timerMutex);
+        if (runTime >= GREEN_LIGHT_TIME) {
+            //if 10 seconds have elapsed since the light has turned green, turn green light off and yellow light on
+            (void) writeLED("/value", GPIO_PATH_26, "0");
+            (void) writeLED("/value", GPIO_PATH_46, "1");
+            break;
+        }
+    }
 }
 
-//Button1 tells trafficLight2 that trafficLight1 needs to start cycling immediately
-void trafficLight2InterruptHandler() {
-    //Set trafficLight2 to Red
-    setLightInitialState(GPIO_PATH_26, GPIO_PATH_46, GPIO_PATH_65);
-    signal(SIGHUP, trafficLight2InterruptHandler);
-    //Tell opposite light to start cycling
-    pthread_kill(thread3, SIGALRM);
+void trafficLight2ToYellowPhase() {
+    while(1) {
+        endTime = time(NULL);
+        pthread_mutex_lock(&timerMutex);
+        time_t runTime = endTime - start_time;
+        pthread_mutex_unlock(&timerMutex);
+        if (runTime >= YELLOW_LIGHT_TIME) {
+            //if 10 seconds have elapsed since the light has turned green, turn green light off and yellow light on
+            (void) writeLED("/value", GPIO_PATH_46, "0");
+            (void) writeLED("/value", GPIO_PATH_65, "1");
+            break;
+        }
+    }
 }
 
 void getButton1PressDuration() {
@@ -221,8 +237,8 @@ void getButton1PressDuration() {
                 if(((end_time - start_time) >= 5)) {
                     //SEND SIGNAL TO OPPOSITE LIGHT HANDLER TO INTERRUPT AND RESET TO RED
                     if(signalSentFlag == 0) {
-                        pthread_kill(thread4, SIGHUP);
-                        signalSentFlag = 1;
+                        //pthread_kill(thread4, SIGHUP);
+                        //signalSentFlag = 1;
                     }
                 }
             }
@@ -260,8 +276,8 @@ void getButton2PressDuration() {
                 if(((end_time - start_time) >= 5)) {
                     //Send signal only once
                     if(signalSentFlag == 0) {
-                        pthread_kill(thread3, SIGILL);
-                        signalSentFlag = 1;
+                        //pthread_kill(thread3, SIGILL);
+                        //signalSentFlag = 1;
                     }
                 }
             }
@@ -289,104 +305,6 @@ static void setLightInitialState(char *greenPort, char *yellowPort, char *redPor
     (void) writeLED("/value", yellowPort, "0");
     (void) writeLED("/value", redPort, "1");
     #endif
-}
-
-void cycleTrafficLight1() {
-    time_t startTime,endTime;
-    int colorTimerFlag = 0;
-    int sig;
-    while(1) {
-        sigwait(&trafficLight1Set, &sig);
-        if (readGPIO("/value", GPIO_PATH_67)) { //If light is currently Red
-            //Turn red off, turn green on
-            (void) writeLED("/value", GPIO_PATH_67, "0");
-            (void) writeLED("/value", GPIO_PATH_44, "1");
-        }
-        while(readGPIO("/value", GPIO_PATH_67) == 0) {
-            if (readGPIO("/value", GPIO_PATH_44)) { //If light is currently Green
-                if (colorTimerFlag == 0) {
-                    colorTimerFlag = 1;
-                    startTime = time(NULL);
-                }
-                if (colorTimerFlag == 1) {
-                    endTime = time(NULL);
-                    if (endTime - startTime >= GREEN_LIGHT_TIME) {
-                        //if 10 seconds have elapsed since the light has turned green, turn green light off and yellow light on
-                        colorTimerFlag = 0;
-                        (void) writeLED("/value", GPIO_PATH_44, "0");
-                        (void) writeLED("/value", GPIO_PATH_68, "1");
-                    }
-                }
-            }
-
-            if (readGPIO("/value", GPIO_PATH_68)) { //If light is currently Yellow
-                if (colorTimerFlag == 0) { //If this is the first iteration
-                    colorTimerFlag = 1;
-                    startTime = time(NULL);
-                }
-                if (colorTimerFlag == 1) {
-                    endTime = time(NULL);
-                    if (endTime - startTime >= YELLOW_LIGHT_TIME) {
-                        //if 10 seconds have elapsed since the light has turned yellow, turn yellow light off and red light on
-                        colorTimerFlag = 0;
-                        (void) writeLED("/value", GPIO_PATH_68, "0");
-                        (void) writeLED("/value", GPIO_PATH_67, "1");
-                        //SEND SIGNAL TO OTHER TRAFFIC LIGHT THREAD TO START CYCLING
-                        pthread_kill(thread4, SIGBUS);
-                    }
-                }
-            }
-        }
-    }
-}
-
-void cycleTrafficLight2() {
-    time_t startTime,endTime;
-    int colorTimerFlag = 0;
-    int sig;
-    while(1) {
-        sigwait(&trafficLight2Set, &sig);
-        if (readGPIO("/value", GPIO_PATH_65)) { //If light is currently Red
-            //Turn red off, turn green on
-            (void) writeLED("/value", GPIO_PATH_65, "0");
-            (void) writeLED("/value", GPIO_PATH_26, "1");
-        }
-        while(readGPIO("/value", GPIO_PATH_65) == 0) {
-            if (readGPIO("/value", GPIO_PATH_26)) { //If light is currently Green
-                if (colorTimerFlag == 0) {
-                    colorTimerFlag = 1;
-                    startTime = time(NULL);
-                }
-                if (colorTimerFlag == 1) {
-                    endTime = time(NULL);
-                    if (endTime - startTime >= GREEN_LIGHT_TIME) {
-                        //if 10 seconds have elapsed since the light has turned green, turn green light off and yellow light on
-                        colorTimerFlag = 0;
-                        (void) writeLED("/value", GPIO_PATH_26, "0");
-                        (void) writeLED("/value", GPIO_PATH_46, "1");
-                    }
-                }
-            }
-
-            if (readGPIO("/value", GPIO_PATH_46)) { //If light is currently Yellow
-                if (colorTimerFlag == 0) { //If this is the first iteration of red
-                    colorTimerFlag = 1;
-                    startTime = time(NULL);
-                }
-                if (colorTimerFlag == 1) {
-                    endTime = time(NULL);
-                    if (endTime - startTime >= YELLOW_LIGHT_TIME) {
-                        //if 10 seconds have elapsed since the light has turned yellow, turn yellow light off and red light on
-                        colorTimerFlag = 0;
-                        (void) writeLED("/value", GPIO_PATH_46, "0");
-                        (void) writeLED("/value", GPIO_PATH_65, "1");
-                        //SEND SIGNAL TO OTHER TRAFFIC LIGHT THREAD
-                        pthread_kill(thread3, SIGALRM);
-                    }
-                }
-            }
-        }
-    }
 }
 
 static int readGPIO(char *filename, char *port) {
