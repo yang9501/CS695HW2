@@ -258,7 +258,7 @@ void testCycleTrafficLight2() {
     int colorTimerFlag = 0;
     while(1) {
         //INSERT SIGNAL WAIT HERE
-        if (readGPIO("/value", GPIO_PATH_67)) { //If light is currently Red
+        if (readGPIO("/value", GPIO_PATH_65)) { //If light is currently Red
             //Turn red off, turn green on
             (void) writeLED("/value", GPIO_PATH_65, "0");
             (void) writeLED("/value", GPIO_PATH_26, "1");
@@ -280,7 +280,7 @@ void testCycleTrafficLight2() {
             }
         }
 
-        if (readGPIO("/value", GPIO_PATH_68)) { //If light is currently Yellow
+        if (readGPIO("/value", GPIO_PATH_46)) { //If light is currently Yellow
             if (colorTimerFlag == 0) { //If this is the first iteration of red
                 colorTimerFlag = 1;
                 startTime = time(NULL);
