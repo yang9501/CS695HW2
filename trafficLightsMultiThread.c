@@ -10,7 +10,7 @@
 #include <signal.h>
 
 //comment out to live run
-#define DEBUG 1
+//#define DEBUG 1
 
 #define GPIO_PATH_44 "/sys/class/gpio/gpio44" //Green 1
 #define GPIO_PATH_68 "/sys/class/gpio/gpio68" //Yellow 1
@@ -74,9 +74,6 @@ int main(void) {
 
     setLightInitialState(trafficLight1Ports[0], trafficLight1Ports[1], trafficLight1Ports[2]);
     setLightInitialState(trafficLight2Ports[0], trafficLight2Ports[1], trafficLight2Ports[2]);
-
-
-    int buttonListener1, buttonListener2;
     signal(SIGILL, testHandler);
     /* Create independent threads each of which will execute function */
     //pthread_create( &thread1, NULL, (void*) getButton1PressDuration, (void*) &thread4);
