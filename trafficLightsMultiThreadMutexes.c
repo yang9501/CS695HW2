@@ -154,7 +154,7 @@ void trafficLight1ToGreenPhase() {
             //if 10 seconds have elapsed since the light has turned green, turn green light off and yellow light on
             (void) writeLED("/value", GPIO_PATH_44, "0");
             (void) writeLED("/value", GPIO_PATH_68, "1");
-            break;
+            return;
         }
     }
 }
@@ -169,7 +169,7 @@ void trafficLight1ToYellowPhase() {
             //if 10 seconds have elapsed since the light has turned green, turn green light off and yellow light on
             (void) writeLED("/value", GPIO_PATH_68, "0");
             (void) writeLED("/value", GPIO_PATH_67, "1");
-            break;
+            return;
         }
     }
 }
@@ -194,7 +194,7 @@ void trafficLight2ToGreenPhase() {
             //if 10 seconds have elapsed since the light has turned green, turn green light off and yellow light on
             (void) writeLED("/value", GPIO_PATH_26, "0");
             (void) writeLED("/value", GPIO_PATH_46, "1");
-            break;
+            return;
         }
     }
 }
@@ -209,7 +209,7 @@ void trafficLight2ToYellowPhase() {
             //if 10 seconds have elapsed since the light has turned green, turn green light off and yellow light on
             (void) writeLED("/value", GPIO_PATH_46, "0");
             (void) writeLED("/value", GPIO_PATH_65, "1");
-            break;
+            return;
         }
     }
 }
