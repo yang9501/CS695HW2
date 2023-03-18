@@ -46,6 +46,9 @@ void getButton2PressDuration();
 void trafficLight1InterruptHandler();
 void trafficLight2InterruptHandler();
 
+void testSignalWaitSend();
+void testWait();
+
 pthread_t thread1, thread2, thread3, thread4;
 
 int main(void) {
@@ -88,8 +91,8 @@ int main(void) {
     //pthread_join(thread3, NULL);
     //pthread_join(thread4, NULL);
 
-    pthread_create( &thread1, NULL, (void*) getButton1PressDuration, NULL);
-    pthread_create( &thread2, NULL, (void*) getButton2PressDuration, NULL);
+    pthread_create( &thread1, NULL, (void*) testWait, NULL);
+    pthread_create( &thread2, NULL, (void*) testSignalWaitSend, NULL);
     pthread_join(thread1, NULL);
     pthread_join(thread2, NULL);
 	return 0;
