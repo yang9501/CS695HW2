@@ -237,8 +237,10 @@ void getButton1PressDuration() {
                 if(((end_time - start_time) >= 5)) {
                     //SEND SIGNAL TO OPPOSITE LIGHT HANDLER TO INTERRUPT AND RESET TO RED
                     if(signalSentFlag == 0) {
-                        //pthread_kill(thread4, SIGHUP);
-                        //signalSentFlag = 1;
+                        //I NEED TO LOCK GPIO VALUES
+                        pthread_mutex_lock(&batonMutex);
+                        baton = 0;
+                        pthread_mutex_unlock(&batonMutex);
                     }
                 }
             }
@@ -276,8 +278,9 @@ void getButton2PressDuration() {
                 if(((end_time - start_time) >= 5)) {
                     //Send signal only once
                     if(signalSentFlag == 0) {
-                        //pthread_kill(thread3, SIGILL);
-                        //signalSentFlag = 1;
+                        pthread_mutex_lock(&batonMutex);
+                        baton = 0;
+                        pthread_mutex_unlock(&batonMutex);
                     }
                 }
             }
