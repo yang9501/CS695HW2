@@ -55,7 +55,7 @@ pthread_t thread1, thread2, thread3, thread4;
 sigset_t trafficLight1Set, trafficLight2Set;
 
 pthread_mutex_t timerMutex;
-time_t start_time;
+time_t startTime;
 time_t endTime;
 
 pthread_mutex_t batonMutex;
@@ -138,7 +138,7 @@ void trafficLight1Cycle() {
     (void) writeLED("/value", GPIO_PATH_67, "0");
     (void) writeLED("/value", GPIO_PATH_44, "1");
     pthread_mutex_lock(&timerMutex);
-    start_time = time(NULL);
+    startTime = time(NULL);
     pthread_mutex_unlock(&timerMutex);
     trafficLight1ToGreenPhase();
     trafficLight1ToYellowPhase();
@@ -148,7 +148,7 @@ void trafficLight1ToGreenPhase() {
     while(baton == 0) {
         endTime = time(NULL);
         pthread_mutex_lock(&timerMutex);
-        time_t runTime = endTime - start_time;
+        time_t runTime = endTime - startTime;
         pthread_mutex_unlock(&timerMutex);
         if (runTime >= GREEN_LIGHT_TIME) {
             //if 10 seconds have elapsed since the light has turned green, turn green light off and yellow light on
@@ -163,7 +163,22 @@ void trafficLight1ToYellowPhase() {
     while(1) {
         endTime = time(NULL);
         pthread_mutex_lock(&timerMutex);
-        time_t runTime = endTime - start_time;
+        time_t runTime = endTime - startTime;
+        pthread_mutex_unlock(&timerMutex);
+        if (runTime >= YELLOW_LIGHT_TIME + GREEN_LIGHT_TIME) {
+            //if 10 seconds have elapsed since the light has turned green, turn green light off and yellow light on
+            (void) writeLED("/value", GPIO_PATH_68, "0");
+            (void) writeLED("/value", GPIO_PATH_67, "1");
+            return;
+        }
+    }
+}
+
+void trafficLight1Interrupt() {
+    while(1) {
+        endTime = time(NULL);
+        pthread_mutex_lock(&timerMutex);
+        time_t runTime = endTime - startTime;
         pthread_mutex_unlock(&timerMutex);
         if (runTime >= YELLOW_LIGHT_TIME + GREEN_LIGHT_TIME) {
             //if 10 seconds have elapsed since the light has turned green, turn green light off and yellow light on
@@ -178,7 +193,7 @@ void trafficLight2Cycle() {
     (void) writeLED("/value", GPIO_PATH_65, "0");
     (void) writeLED("/value", GPIO_PATH_26, "1");
     pthread_mutex_lock(&timerMutex);
-    start_time = time(NULL);
+    startTime = time(NULL);
     pthread_mutex_unlock(&timerMutex);
     trafficLight2ToGreenPhase();
     trafficLight2ToYellowPhase();
@@ -188,7 +203,7 @@ void trafficLight2ToGreenPhase() {
     while(baton == 1) {
         endTime = time(NULL);
         pthread_mutex_lock(&timerMutex);
-        time_t runTime = endTime - start_time;
+        time_t runTime = endTime - startTime;
         pthread_mutex_unlock(&timerMutex);
         if (runTime >= GREEN_LIGHT_TIME) {
             //if 10 seconds have elapsed since the light has turned green, turn green light off and yellow light on
@@ -203,7 +218,7 @@ void trafficLight2ToYellowPhase() {
     while(1) {
         endTime = time(NULL);
         pthread_mutex_lock(&timerMutex);
-        time_t runTime = endTime - start_time;
+        time_t runTime = endTime - startTime;
         pthread_mutex_unlock(&timerMutex);
         if (runTime >= YELLOW_LIGHT_TIME + GREEN_LIGHT_TIME) {
             //if 10 seconds have elapsed since the light has turned green, turn green light off and yellow light on
@@ -238,9 +253,11 @@ void getButton1PressDuration() {
                     //SEND SIGNAL TO OPPOSITE LIGHT HANDLER TO INTERRUPT AND RESET TO RED
                     if(signalSentFlag == 0) {
                         //I NEED TO MANIPULATE TIMER
-                        pthread_mutex_lock(&batonMutex);
-                        baton = 0;
-                        pthread_mutex_unlock(&batonMutex);
+                        pthread_mutex_lock(&timerMutex);
+                        if(startTime < GREEN_LIGHT_TIME) {
+                            startTime = endTime - (GREEN_LIGHT_TIME + YELLOW_LIGHT_TIME);
+                        }
+                        pthread_mutex_unlock(&timerMutex);
                     }
                 }
             }
@@ -279,9 +296,11 @@ void getButton2PressDuration() {
                     //Send signal only once
                     if(signalSentFlag == 0) {
                         //I NEED TO MANIPULATE TIMER
-                        pthread_mutex_lock(&batonMutex);
-                        baton = 0;
-                        pthread_mutex_unlock(&batonMutex);
+                        pthread_mutex_lock(&timerMutex);
+                        if(startTime < GREEN_LIGHT_TIME) {
+                            startTime = endTime - (GREEN_LIGHT_TIME + YELLOW_LIGHT_TIME);
+                        }
+                        pthread_mutex_unlock(&timerMutex);
                     }
                 }
             }
