@@ -98,6 +98,8 @@ int main(void) {
 void testSignalWaitSend() {
     while(1) {
         sleep(4);
+        printf("Sending signal...");
+        fflush(stdout);
         pthread_kill(thread2, SIGALRM);
     }
 }
