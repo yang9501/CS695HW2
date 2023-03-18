@@ -145,7 +145,7 @@ void trafficLight1Cycle() {
 }
 
 void trafficLight1ToGreenPhase() {
-    while(baton == 0) {
+    while(1) {
         endTime = time(NULL);
         pthread_mutex_lock(&timerMutex);
         time_t runTime = endTime - startTime;
@@ -174,21 +174,6 @@ void trafficLight1ToYellowPhase() {
     }
 }
 
-void trafficLight1Interrupt() {
-    while(1) {
-        endTime = time(NULL);
-        pthread_mutex_lock(&timerMutex);
-        time_t runTime = endTime - startTime;
-        pthread_mutex_unlock(&timerMutex);
-        if (runTime >= YELLOW_LIGHT_TIME + GREEN_LIGHT_TIME) {
-            //if 10 seconds have elapsed since the light has turned green, turn green light off and yellow light on
-            (void) writeLED("/value", GPIO_PATH_68, "0");
-            (void) writeLED("/value", GPIO_PATH_67, "1");
-            return;
-        }
-    }
-}
-
 void trafficLight2Cycle() {
     (void) writeLED("/value", GPIO_PATH_65, "0");
     (void) writeLED("/value", GPIO_PATH_26, "1");
@@ -200,7 +185,7 @@ void trafficLight2Cycle() {
 }
 
 void trafficLight2ToGreenPhase() {
-    while(baton == 1) {
+    while(1) {
         endTime = time(NULL);
         pthread_mutex_lock(&timerMutex);
         time_t runTime = endTime - startTime;
@@ -250,14 +235,14 @@ void getButton1PressDuration() {
             else {
                 end_time = time(NULL);
                 if(((end_time - start_time) >= 5)) {
-                    //SEND SIGNAL TO OPPOSITE LIGHT HANDLER TO INTERRUPT AND RESET TO RED
                     if(signalSentFlag == 0) {
-                        //I NEED TO MANIPULATE TIMER
+                        //ADD RED LIGHT CHECK
                         pthread_mutex_lock(&timerMutex);
                         if(endTime - startTime < GREEN_LIGHT_TIME) {
-                            startTime = startTime - (GREEN_LIGHT_TIME + YELLOW_LIGHT_TIME);
+                            startTime = startTime - (GREEN_LIGHT_TIME + startTime - endTime);
                         }
                         pthread_mutex_unlock(&timerMutex);
+                        signalSentFlag = 1;
                     }
                 }
             }
@@ -295,12 +280,13 @@ void getButton2PressDuration() {
                 if(((end_time - start_time) >= 5)) {
                     //Send signal only once
                     if(signalSentFlag == 0) {
-                        //I NEED TO MANIPULATE TIMER
+                        //ADD RED LIGHT CHECK
                         pthread_mutex_lock(&timerMutex);
                         if(endTime - startTime < GREEN_LIGHT_TIME) {
-                            startTime = startTime - (GREEN_LIGHT_TIME + YELLOW_LIGHT_TIME);
+                            startTime = startTime - (GREEN_LIGHT_TIME + startTime - endTime);
                         }
                         pthread_mutex_unlock(&timerMutex);
+                        signalSentFlag = 1;
                     }
                 }
             }
