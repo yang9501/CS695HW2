@@ -100,7 +100,7 @@ int main(void) {
 }
 
 void testArgument(void* trafficPort) {
-    char* trafficPortCast = (char*) trafficPort;
+    char* trafficPortCast[25] = (char*) trafficPort;
     printf("hello\n");
     printf("%s\n",trafficPortCast[1]);
 }
