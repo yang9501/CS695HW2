@@ -93,7 +93,7 @@ int main(void) {
     //pthread_join(thread4, NULL);
 
     sigemptyset(&set);
-    sigaddset(&set, SIGINT);
+    sigaddset(&set, SIGALRM);
     pthread_sigmask(SIG_BLOCK, &set, 0);
 
     pthread_create( &thread1, NULL, (void*) testWait, NULL);
@@ -106,7 +106,7 @@ int main(void) {
 void testSignalWaitSend() {
     while(1) {
         sleep(4);
-        pthread_kill(thread1, SIGINT);
+        pthread_kill(thread1, SIGALRM);
         sleep(1);
     }
 }
