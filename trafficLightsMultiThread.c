@@ -350,7 +350,7 @@ void cycleTrafficLight2() {
                         (void) writeLED("/value", GPIO_PATH_46, "0");
                         (void) writeLED("/value", GPIO_PATH_65, "1");
                         //SEND SIGNAL TO OTHER TRAFFIC LIGHT THREAD
-                        pthread_kill(thread4, SIGALRM);
+                        pthread_kill(thread3, SIGALRM);
                     }
                 }
             }
