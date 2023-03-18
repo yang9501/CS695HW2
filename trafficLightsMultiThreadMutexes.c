@@ -139,6 +139,7 @@ void testTrafficLight2() {
 }
 
 void trafficLight1Cycle() {
+    (void) writeLED("/value", GPIO_PATH_67, "0");
     (void) writeLED("/value", GPIO_PATH_44, "1");
     sleep(GREEN_LIGHT_TIME);
     (void) writeLED("/value", GPIO_PATH_44, "0");
@@ -147,6 +148,7 @@ void trafficLight1Cycle() {
 }
 
 void trafficLight2Cycle() {
+    (void) writeLED("/value", GPIO_PATH_65, "0");
     (void) writeLED("/value", GPIO_PATH_26, "1");
     sleep(GREEN_LIGHT_TIME);
     (void) writeLED("/value", GPIO_PATH_26, "0");
