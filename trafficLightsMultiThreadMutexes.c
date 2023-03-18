@@ -135,26 +135,27 @@ void trafficLight2Thread() {
 }
 
 void trafficLight1Cycle() {
-    (void) writeLED("/value", GPIO_PATH_67, "0");
-    (void) writeLED("/value", GPIO_PATH_44, "1");
     pthread_mutex_lock(&timerMutex);
     startTime = time(NULL);
     pthread_mutex_unlock(&timerMutex);
+    (void) writeLED("/value", GPIO_PATH_67, "0");
+    (void) writeLED("/value", GPIO_PATH_44, "1");
+
     trafficLight1ToGreenPhase();
     trafficLight1ToYellowPhase();
 }
 
 void trafficLight1ToGreenPhase() {
     while(1) {
-        endTime = time(NULL);
         pthread_mutex_lock(&timerMutex);
+        endTime = time(NULL);
         time_t runTime = endTime - startTime;
         pthread_mutex_unlock(&timerMutex);
         if (runTime >= GREEN_LIGHT_TIME) {
             //if 10 seconds have elapsed since the light has turned green, turn green light off and yellow light on
             (void) writeLED("/value", GPIO_PATH_44, "0");
             (void) writeLED("/value", GPIO_PATH_68, "1");
-            return;
+            break;
         }
     }
 }
@@ -166,28 +167,29 @@ void trafficLight1ToYellowPhase() {
         time_t runTime = endTime - startTime;
         pthread_mutex_unlock(&timerMutex);
         if (runTime >= YELLOW_LIGHT_TIME + GREEN_LIGHT_TIME) {
-            //if 10 seconds have elapsed since the light has turned green, turn green light off and yellow light on
+            //if 15 seconds have elapsed since the light has turned green, turn yellow light off and red light on
             (void) writeLED("/value", GPIO_PATH_68, "0");
             (void) writeLED("/value", GPIO_PATH_67, "1");
-            return;
+            break;
         }
     }
 }
 
 void trafficLight2Cycle() {
-    (void) writeLED("/value", GPIO_PATH_65, "0");
-    (void) writeLED("/value", GPIO_PATH_26, "1");
     pthread_mutex_lock(&timerMutex);
     startTime = time(NULL);
     pthread_mutex_unlock(&timerMutex);
+    (void) writeLED("/value", GPIO_PATH_65, "0");
+    (void) writeLED("/value", GPIO_PATH_26, "1");
+
     trafficLight2ToGreenPhase();
     trafficLight2ToYellowPhase();
 }
 
 void trafficLight2ToGreenPhase() {
     while(1) {
-        endTime = time(NULL);
         pthread_mutex_lock(&timerMutex);
+        endTime = time(NULL);
         time_t runTime = endTime - startTime;
         pthread_mutex_unlock(&timerMutex);
         if (runTime >= GREEN_LIGHT_TIME) {
@@ -239,7 +241,11 @@ void getButton1PressDuration() {
                         //ADD RED LIGHT CHECK
                         pthread_mutex_lock(&timerMutex);
                         if(endTime - startTime < GREEN_LIGHT_TIME) {
+                            printf("Old Start time: %ld\n", startTime);
+                            fflush( stdout );
                             startTime = startTime - (GREEN_LIGHT_TIME + startTime - endTime);
+                            printf("New Start time: %ld\n", startTime);
+                            fflush( stdout );
                         }
                         pthread_mutex_unlock(&timerMutex);
                         signalSentFlag = 1;
@@ -282,9 +288,11 @@ void getButton2PressDuration() {
                     if(signalSentFlag == 0) {
                         //ADD RED LIGHT CHECK
                         pthread_mutex_lock(&timerMutex);
-                        if(endTime - startTime < GREEN_LIGHT_TIME) {
-                            startTime = startTime - (GREEN_LIGHT_TIME + startTime - endTime);
-                        }
+                        printf("Old Start time: %ld\n", startTime);
+                        fflush( stdout );
+                        startTime = startTime - (GREEN_LIGHT_TIME + startTime - endTime);
+                        printf("New Start time: %ld\n", startTime);
+                        fflush( stdout );
                         pthread_mutex_unlock(&timerMutex);
                         signalSentFlag = 1;
                     }
