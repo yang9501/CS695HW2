@@ -271,7 +271,7 @@ void cycleTrafficLight1() {
             (void) writeLED("/value", GPIO_PATH_67, "0");
             (void) writeLED("/value", GPIO_PATH_44, "1");
         }
-        while(readGPIO("/value", GPIO_PATH_67) != 0) {
+        while(readGPIO("/value", GPIO_PATH_67) == 0) {
             if (readGPIO("/value", GPIO_PATH_44)) { //If light is currently Green
                 if (colorTimerFlag == 0) {
                     colorTimerFlag = 1;
@@ -320,7 +320,7 @@ void cycleTrafficLight2() {
             (void) writeLED("/value", GPIO_PATH_65, "0");
             (void) writeLED("/value", GPIO_PATH_26, "1");
         }
-        while(readGPIO("/value", GPIO_PATH_65) != 0) {
+        while(readGPIO("/value", GPIO_PATH_65) == 0) {
             if (readGPIO("/value", GPIO_PATH_26)) { //If light is currently Green
                 if (colorTimerFlag == 0) {
                     colorTimerFlag = 1;
