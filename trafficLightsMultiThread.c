@@ -89,7 +89,7 @@ int main(void) {
     pthread_create( &thread1, NULL, (void*) getButtonPressDuration, (void*) buttonPorts[0]);
     pthread_create( &thread2, NULL, (void*) getButtonPressDuration, (void*) buttonPorts[1]);
     printf("%s\n", trafficLight1Ports[1]);
-    pthread_create( &thread3, NULL, (void *) testArgument, &trafficLight1Ports[0][0]);
+    pthread_create( &thread3, NULL, (void *) testArgument, trafficLight1Ports);
     //pthread_create( &thread3, NULL, (void *) trafficLight1Thread, (void*) &trafficLight1Ports[0][0]);
     //pthread_create( &thread4, NULL, (void *) trafficLight2Thread, NULL);
 
@@ -99,10 +99,9 @@ int main(void) {
 	return 0;
 }
 
-void testArgument(void* trafficPort) {
-    char* trafficPortCast = (char*) trafficPort;
+void testArgument(char trafficLight1Ports[3][25]) {
     printf("hello\n");
-    printf("%s\n",trafficPortCast[1]);
+    printf("%s\n",trafficLight1Ports[1]);
 }
 
 void trafficLight1Thread() {
