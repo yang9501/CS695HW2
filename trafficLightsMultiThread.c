@@ -101,9 +101,11 @@ int main(void) {
 }
 
 void trafficLight1Thread(char trafficLight1Ports[3][25]) {
+    int initialStateFlag = 0;
     while(1) {
         //If it's traffic light 1's turn
         if(baton == 0) {
+            initialStateFlag = 0;
             trafficLightCycle(trafficLight1Ports);
             pthread_mutex_lock(&batonMutex);
             baton = 1;
@@ -111,19 +113,27 @@ void trafficLight1Thread(char trafficLight1Ports[3][25]) {
         }
         //If it's traffic light 2's turn
         if(baton == 1) {
-            setLightInitialState(trafficLight1Ports[0], trafficLight1Ports[1], trafficLight1Ports[2]);
+            if(initialStateFlag == 0) {
+                setLightInitialState(trafficLight1Ports[0], trafficLight1Ports[1], trafficLight1Ports[2]);
+                initialStateFlag = 1;
+            }
         }
     }
 }
 
 void trafficLight2Thread(char trafficLight2Ports[3][25]) {
+    int initialStateFlag = 0;
     while(1) {
         //If it's traffic light 1's turn
         if(baton == 0) {
-            setLightInitialState(trafficLight2Ports[0], trafficLight2Ports[1], trafficLight2Ports[2]);
+            if(initialStateFlag == 0) {
+                setLightInitialState(trafficLight2Ports[0], trafficLight2Ports[1], trafficLight2Ports[2]);
+                initialStateFlag = 1;
+            }
         }
         //If it's traffic light 2's turn
         if(baton == 1) {
+            initialStateFlag = 0;
             trafficLightCycle(trafficLight2Ports);
             pthread_mutex_lock(&batonMutex);
             baton = 0;
