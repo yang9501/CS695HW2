@@ -101,6 +101,7 @@ int main(void) {
 
 void testArgument(void* trafficPort) {
     char* trafficPortCast = (char*) trafficPort;
+    printf("hello\n");
     printf("%s\n",trafficPortCast[1]);
 }
 
