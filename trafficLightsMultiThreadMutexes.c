@@ -56,7 +56,7 @@ sigset_t trafficLight1Set, trafficLight2Set;
 
 pthread_mutex_t timerMutex;
 time_t start_time;
-time_t end_time;
+time_t endTime;
 
 pthread_mutex_t batonMutex;
 int baton = 0;
