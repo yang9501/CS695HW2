@@ -35,16 +35,13 @@ static int readGPIO(char *filename, char *port);
 static void setLightInitialState(char *greenPort, char *yellowPort, char *redPort);
 
 //Primary light switch logic
-void trafficLight1Cycle();
-void trafficLight2Cycle();
+void trafficLightCycle(char trafficLight2Ports[3][25]);
 
 //Primary button press detection
 void getButtonPressDuration(void *buttonPort);
 
-void trafficLight1Thread();
-void trafficLight2Thread();
-
-void testArgument(char trafficLight1Ports[3][25]);
+void trafficLight1Thread(char trafficLight1Ports[3][25]);
+void trafficLight2Thread(char trafficLight2Ports[3][25]);
 
 pthread_t thread1, thread2, thread3, thread4;
 
@@ -88,10 +85,11 @@ int main(void) {
     /* Create independent threads each of which will execute function */
     pthread_create( &thread1, NULL, (void*) getButtonPressDuration, (void*) buttonPorts[0]);
     pthread_create( &thread2, NULL, (void*) getButtonPressDuration, (void*) buttonPorts[1]);
-    printf("%s\n", trafficLight1Ports[1]);
-    pthread_create( &thread3, NULL, (void *) testArgument, trafficLight1Ports);
-    //pthread_create( &thread3, NULL, (void *) trafficLight1Thread, (void*) &trafficLight1Ports[0][0]);
-    //pthread_create( &thread4, NULL, (void *) trafficLight2Thread, NULL);
+    pthread_create( &thread3, NULL, (void *) trafficLight1Thread, trafficLight1Ports);
+    pthread_create( &thread4, NULL, (void *) trafficLight2Thread, trafficLight2Ports);
+
+    //TEST
+    //pthread_create( &thread3, NULL, (void *) testArgument, trafficLight1Ports);
 
     pthread_join(thread3, NULL);
     pthread_join(thread4, NULL);
@@ -99,35 +97,31 @@ int main(void) {
 	return 0;
 }
 
-void testArgument(char trafficLight1Ports[3][25]) {
-    printf("hello\n");
-    printf("%s\n",trafficLight1Ports[2]);
-}
-
-void trafficLight1Thread() {
+void trafficLight1Thread(char trafficLight1Ports[3][25]) {
     while(1) {
         //If it's traffic light 1's turn
         if(baton == 0) {
-            trafficLight1Cycle();
+            trafficLightCycle(trafficLight1Ports);
             pthread_mutex_lock(&batonMutex);
             baton = 1;
             pthread_mutex_unlock(&batonMutex);
         }
         //If it's traffic light 2's turn
         if(baton == 1) {
-            setLightInitialState(GPIO_PATH_44, GPIO_PATH_68, GPIO_PATH_67);
+            setLightInitialState(trafficLight1Ports[0], trafficLight1Ports[1], trafficLight1Ports[2]);
         }
     }
 }
 
-void trafficLight2Thread() {
+void trafficLight2Thread(char trafficLight2Ports[3][25]) {
     while(1) {
         //If it's traffic light 1's turn
         if(baton == 0) {
-            setLightInitialState(GPIO_PATH_26, GPIO_PATH_46, GPIO_PATH_65);
+            setLightInitialState(trafficLight2Ports[0], trafficLight2Ports[1], trafficLight2Ports[2]);
         }
+        //If it's traffic light 2's turn
         if(baton == 1) {
-            trafficLight2Cycle();
+            trafficLightCycle(trafficLight2Ports);
             pthread_mutex_lock(&batonMutex);
             baton = 0;
             pthread_mutex_unlock(&batonMutex);
@@ -135,12 +129,12 @@ void trafficLight2Thread() {
     }
 }
 
-void trafficLight1Cycle() {
+void trafficLightCycle(char trafficLightPorts[3][25]) {
     pthread_mutex_lock(&timerMutex);
     startTime = time(NULL);
     pthread_mutex_unlock(&timerMutex);
-    (void) writeLED("/value", GPIO_PATH_67, "0");
-    (void) writeLED("/value", GPIO_PATH_44, "1");
+    (void) writeLED("/value", trafficLightPorts[2], "0");
+    (void) writeLED("/value", trafficLightPorts[0], "1");
 
     while(1) {
         pthread_mutex_lock(&timerMutex);
@@ -149,8 +143,8 @@ void trafficLight1Cycle() {
         pthread_mutex_unlock(&timerMutex);
         if (runTime >= GREEN_LIGHT_TIME) {
             //if 10 seconds have elapsed since the light has turned green, turn green light off and yellow light on
-            (void) writeLED("/value", GPIO_PATH_44, "0");
-            (void) writeLED("/value", GPIO_PATH_68, "1");
+            (void) writeLED("/value", trafficLightPorts[0], "0");
+            (void) writeLED("/value", trafficLightPorts[1], "1");
             break;
         }
     }
@@ -162,42 +156,8 @@ void trafficLight1Cycle() {
         pthread_mutex_unlock(&timerMutex);
         if (runTime >= YELLOW_LIGHT_TIME + GREEN_LIGHT_TIME) {
             //if 15 seconds have elapsed since the light has turned green, turn yellow light off and red light on
-            (void) writeLED("/value", GPIO_PATH_68, "0");
-            (void) writeLED("/value", GPIO_PATH_67, "1");
-            break;
-        }
-    }
-}
-
-void trafficLight2Cycle() {
-    pthread_mutex_lock(&timerMutex);
-    startTime = time(NULL);
-    pthread_mutex_unlock(&timerMutex);
-    (void) writeLED("/value", GPIO_PATH_65, "0");
-    (void) writeLED("/value", GPIO_PATH_26, "1");
-
-    while(1) {
-        pthread_mutex_lock(&timerMutex);
-        endTime = time(NULL);
-        time_t runTime = endTime - startTime;
-        pthread_mutex_unlock(&timerMutex);
-        if (runTime >= GREEN_LIGHT_TIME) {
-            //if 10 seconds have elapsed since the light has turned green, turn green light off and yellow light on
-            (void) writeLED("/value", GPIO_PATH_26, "0");
-            (void) writeLED("/value", GPIO_PATH_46, "1");
-            break;
-        }
-    }
-
-    while(1) {
-        endTime = time(NULL);
-        pthread_mutex_lock(&timerMutex);
-        time_t runTime = endTime - startTime;
-        pthread_mutex_unlock(&timerMutex);
-        if (runTime >= YELLOW_LIGHT_TIME + GREEN_LIGHT_TIME) {
-            //if 15 seconds have elapsed since the light has turned green, turn yellow light off and red light on
-            (void) writeLED("/value", GPIO_PATH_46, "0");
-            (void) writeLED("/value", GPIO_PATH_65, "1");
+            (void) writeLED("/value", trafficLightPorts[1], "0");
+            (void) writeLED("/value", trafficLightPorts[2], "1");
             break;
         }
     }
