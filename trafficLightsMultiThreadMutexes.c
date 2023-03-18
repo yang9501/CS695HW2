@@ -145,7 +145,7 @@ void trafficLight1Cycle() {
 }
 
 void trafficLight1ToGreenPhase() {
-    while(1) {
+    while(baton == 0) {
         endTime = time(NULL);
         pthread_mutex_lock(&timerMutex);
         time_t runTime = endTime - start_time;
@@ -185,7 +185,7 @@ void trafficLight2Cycle() {
 }
 
 void trafficLight2ToGreenPhase() {
-    while(1) {
+    while(baton == 1) {
         endTime = time(NULL);
         pthread_mutex_lock(&timerMutex);
         time_t runTime = endTime - start_time;
@@ -237,7 +237,7 @@ void getButton1PressDuration() {
                 if(((end_time - start_time) >= 5)) {
                     //SEND SIGNAL TO OPPOSITE LIGHT HANDLER TO INTERRUPT AND RESET TO RED
                     if(signalSentFlag == 0) {
-                        //I NEED TO LOCK GPIO VALUES
+                        //I NEED TO MANIPULATE TIMER
                         pthread_mutex_lock(&batonMutex);
                         baton = 0;
                         pthread_mutex_unlock(&batonMutex);
@@ -278,6 +278,7 @@ void getButton2PressDuration() {
                 if(((end_time - start_time) >= 5)) {
                     //Send signal only once
                     if(signalSentFlag == 0) {
+                        //I NEED TO MANIPULATE TIMER
                         pthread_mutex_lock(&batonMutex);
                         baton = 0;
                         pthread_mutex_unlock(&batonMutex);
