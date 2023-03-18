@@ -207,45 +207,46 @@ static void setLightInitialState(char *greenPort, char *yellowPort, char *redPor
 void testCycleTrafficLight1() {
     time_t startTime,endTime;
     int colorTimerFlag = 0;
-    if(readGPIO("/value", GPIO_PATH_67)) { //If light is currently Red
-        //Turn red off, turn green on
-        (void) writeLED("/value", GPIO_PATH_67, "0");
-        (void) writeLED("/value", GPIO_PATH_44, "1");
-    }
-
-    if(readGPIO("/value", GPIO_PATH_44)) { //If light is currently Green
-        if(colorTimerFlag == 0) {
-            colorTimerFlag = 1;
-            startTime = time(NULL);
+    while(1) {
+        if (readGPIO("/value", GPIO_PATH_67)) { //If light is currently Red
+            //Turn red off, turn green on
+            (void) writeLED("/value", GPIO_PATH_67, "0");
+            (void) writeLED("/value", GPIO_PATH_44, "1");
         }
-        if(colorTimerFlag == 1) {
-            endTime = time(NULL);
-            if(endTime-startTime >= GREEN_LIGHT_TIME) {
-                //if 10 seconds have elapsed since the light has turned green, turn green light off and yellow light on
-                colorTimerFlag = 0;
-                (void) writeLED("/value", GPIO_PATH_44, "0");
-                (void) writeLED("/value", GPIO_PATH_68, "1");
+
+        if (readGPIO("/value", GPIO_PATH_44)) { //If light is currently Green
+            if (colorTimerFlag == 0) {
+                colorTimerFlag = 1;
+                startTime = time(NULL);
+            }
+            if (colorTimerFlag == 1) {
+                endTime = time(NULL);
+                if (endTime - startTime >= GREEN_LIGHT_TIME) {
+                    //if 10 seconds have elapsed since the light has turned green, turn green light off and yellow light on
+                    colorTimerFlag = 0;
+                    (void) writeLED("/value", GPIO_PATH_44, "0");
+                    (void) writeLED("/value", GPIO_PATH_68, "1");
+                }
+            }
+        }
+
+        if (readGPIO("/value", GPIO_PATH_68)) { //If light is currently Yellow
+            if (colorTimerFlag == 0) { //If this is the first iteration of red
+                colorTimerFlag = 1;
+                startTime = time(NULL);
+            }
+            if (colorTimerFlag == 1) {
+                endTime = time(NULL);
+                if (endTime - startTime >= YELLOW_LIGHT_TIME) {
+                    //if 10 seconds have elapsed since the light has turned yellow, turn yellow light off and red light on
+                    colorTimerFlag = 0;
+                    (void) writeLED("/value", GPIO_PATH_68, "0");
+                    (void) writeLED("/value", GPIO_PATH_67, "1");
+                    //SEND SIGNAL TO OTHER TRAFFIC LIGHT THREAD
+                }
             }
         }
     }
-
-    if(readGPIO("/value", GPIO_PATH_68)) { //If light is currently Yellow
-        if(colorTimerFlag == 0) { //If this is the first iteration of red
-            colorTimerFlag = 1;
-            startTime = time(NULL);
-        }
-        if(colorTimerFlag == 1) {
-            endTime = time(NULL);
-            if(endTime-startTime >= YELLOW_LIGHT_TIME) {
-                //if 10 seconds have elapsed since the light has turned yellow, turn yellow light off and red light on
-                colorTimerFlag = 0;
-                (void) writeLED("/value", GPIO_PATH_68, "0");
-                (void) writeLED("/value", GPIO_PATH_67, "1");
-                //SEND SIGNAL TO OTHER TRAFFIC LIGHT THREAD
-            }
-        }
-    }
-
 }
 
 void cycleTrafficLight1(void *trafficLight2ThreadId) {
