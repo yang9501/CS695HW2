@@ -38,6 +38,7 @@ static void setLightInitialState(char *greenPort, char *yellowPort, char *redPor
 void cycleTrafficLight1(void *trafficLight2ThreadId);
 void cycleTrafficLight2(void *trafficLight1ThreadId);
 void testCycleTrafficLight1();
+void testCycleTrafficLight2();
 
 void getButton1PressDuration(void *trafficLight1ThreadId);
 void getButton2PressDuration(void *trafficLight2ThreadId);
@@ -81,8 +82,10 @@ int main(void) {
     //pthread_create( &thread3, NULL, (void *)cycleTrafficLight1, (void*) &thread4);
     //pthread_create( &thread4, NULL, (void *)cycleTrafficLight2, (void*) &thread3);
     pthread_create( &thread3, NULL, (void *) testCycleTrafficLight1, NULL);
+    pthread_create( &thread4, NULL, (void *) testCycleTrafficLight2, NULL);
     //pthread_create( &thread4, NULL, (void *) testSendSignal, NULL);
     pthread_join(thread3, NULL);
+    pthread_join(thread4, NULL);
 	return 0;
 }
 
@@ -208,6 +211,7 @@ void testCycleTrafficLight1() {
     time_t startTime,endTime;
     int colorTimerFlag = 0;
     while(1) {
+        //INSERT SIGNAL WAIT HERE
         if (readGPIO("/value", GPIO_PATH_67)) { //If light is currently Red
             //Turn red off, turn green on
             (void) writeLED("/value", GPIO_PATH_67, "0");
@@ -242,6 +246,52 @@ void testCycleTrafficLight1() {
                     colorTimerFlag = 0;
                     (void) writeLED("/value", GPIO_PATH_68, "0");
                     (void) writeLED("/value", GPIO_PATH_67, "1");
+                    //SEND SIGNAL TO OTHER TRAFFIC LIGHT THREAD
+                }
+            }
+        }
+    }
+}
+
+void testCycleTrafficLight2() {
+    time_t startTime,endTime;
+    int colorTimerFlag = 0;
+    while(1) {
+        //INSERT SIGNAL WAIT HERE
+        if (readGPIO("/value", GPIO_PATH_67)) { //If light is currently Red
+            //Turn red off, turn green on
+            (void) writeLED("/value", GPIO_PATH_65, "0");
+            (void) writeLED("/value", GPIO_PATH_26, "1");
+        }
+
+        if (readGPIO("/value", GPIO_PATH_26)) { //If light is currently Green
+            if (colorTimerFlag == 0) {
+                colorTimerFlag = 1;
+                startTime = time(NULL);
+            }
+            if (colorTimerFlag == 1) {
+                endTime = time(NULL);
+                if (endTime - startTime >= GREEN_LIGHT_TIME) {
+                    //if 10 seconds have elapsed since the light has turned green, turn green light off and yellow light on
+                    colorTimerFlag = 0;
+                    (void) writeLED("/value", GPIO_PATH_26, "0");
+                    (void) writeLED("/value", GPIO_PATH_46, "1");
+                }
+            }
+        }
+
+        if (readGPIO("/value", GPIO_PATH_68)) { //If light is currently Yellow
+            if (colorTimerFlag == 0) { //If this is the first iteration of red
+                colorTimerFlag = 1;
+                startTime = time(NULL);
+            }
+            if (colorTimerFlag == 1) {
+                endTime = time(NULL);
+                if (endTime - startTime >= YELLOW_LIGHT_TIME) {
+                    //if 10 seconds have elapsed since the light has turned yellow, turn yellow light off and red light on
+                    colorTimerFlag = 0;
+                    (void) writeLED("/value", GPIO_PATH_46, "0");
+                    (void) writeLED("/value", GPIO_PATH_65, "1");
                     //SEND SIGNAL TO OTHER TRAFFIC LIGHT THREAD
                 }
             }
