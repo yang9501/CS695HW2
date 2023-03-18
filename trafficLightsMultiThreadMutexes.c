@@ -94,8 +94,8 @@ int main(void) {
     /* Create independent threads each of which will execute function */
     pthread_create( &thread1, NULL, (void*) getButton1PressDuration, NULL);
     pthread_create( &thread2, NULL, (void*) getButton2PressDuration, NULL);
-    pthread_create( &thread3, NULL, (void *) testTrafficLight1, NULL);
-    pthread_create( &thread4, NULL, (void *) testTrafficLight2, NULL);
+    pthread_create( &thread3, NULL, (void *) trafficLight1Thread, NULL);
+    pthread_create( &thread4, NULL, (void *) trafficLight2Thread, NULL);
 
     pthread_join(thread3, NULL);
     pthread_join(thread4, NULL);
