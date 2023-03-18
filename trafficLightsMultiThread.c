@@ -85,10 +85,14 @@ int main(void) {
 	return 0;
 }
 
+//SIGILL: TrafficLight1's signal to interrupt and set to red
+//SIGXXX: TrafficLight1's signal to start cycling
+
+//SIGXXX: TrafficLight2's signal to interrupt and set to red
+//SIGXXX: TrafficLight2's signal to start cycling
 void testHandler() {
-    sleep(2);
     printf("----------------------------\n");
-    sleep(2);
+    setLightInitialState(GPIO_PATH_44, GPIO_PATH_68, GPIO_PATH_67);
     signal(SIGILL, testHandler);
 }
 
