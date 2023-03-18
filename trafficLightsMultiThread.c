@@ -35,10 +35,8 @@ static int readGPIO(char *filename, char *port);
 static void setLightInitialState(char *greenPort, char *yellowPort, char *redPort);
 
 //Primary light switch logic
-void cycleTrafficLight1(void *trafficLight2ThreadId);
-void cycleTrafficLight2(void *trafficLight1ThreadId);
-void testCycleTrafficLight1();
-void testCycleTrafficLight2();
+void cycleTrafficLight1();
+void cycleTrafficLight2();
 
 void getButton1PressDuration(void *trafficLight1ThreadId);
 void getButton2PressDuration(void *trafficLight2ThreadId);
@@ -79,10 +77,8 @@ int main(void) {
     /* Create independent threads each of which will execute function */
     //pthread_create( &thread1, NULL, (void*) getButton1PressDuration, (void*) &thread4);
     //pthread_create( &thread2, NULL, (void*) getButton2PressDuration, (void*) &thread3);
-    //pthread_create( &thread3, NULL, (void *)cycleTrafficLight1, (void*) &thread4);
-    //pthread_create( &thread4, NULL, (void *)cycleTrafficLight2, (void*) &thread3);
-    pthread_create( &thread3, NULL, (void *) testCycleTrafficLight1, NULL);
-    pthread_create( &thread4, NULL, (void *) testCycleTrafficLight2, NULL);
+    pthread_create( &thread3, NULL, (void *) cycleTrafficLight1, NULL);
+    pthread_create( &thread4, NULL, (void *) cycleTrafficLight2, NULL);
     //pthread_create( &thread4, NULL, (void *) testSendSignal, NULL);
     pthread_join(thread3, NULL);
     pthread_join(thread4, NULL);
@@ -153,24 +149,17 @@ void getButton1PressDuration(void *trafficLight1ThreadId) {
 }
 
 void getButton2PressDuration(void *trafficLight2ThreadId) {
-    //https://www.youtube.com/watch?v=b2_jS3ZMwtM
-    //https://forum.beagleboard.org/t/reading-gpio-state-in-beagle-bone-black/1649
-    //https://www.dummies.com/article/technology/computers/hardware/beaglebone/setting-beaglebone-gpios-as-inputs-144958/
-    //https://learn.adafruit.com/connecting-a-push-button-to-beaglebone-black/wiring
     time_t start_time;
     time_t end_time;
     int pressedFlag = 0;
     int gpioValue;
     while(1) {
         gpioValue = readGPIO("/value", GPIO_PATH_69);
-        //printf("%d", pressedFlag);
         if(gpioValue == 1){
             //first press detected
             if(pressedFlag == 0) {
-                //printf("FIRST PRESSED");
                 start_time = time(NULL);
-                //printf("%ld", start_time);
-                fflush( stdout );   //https://stackoverflow.com/questions/16870059/printf-not-printing-to-screen
+                fflush( stdout );
                 pressedFlag = 1;
             }
             else {
@@ -207,7 +196,7 @@ static void setLightInitialState(char *greenPort, char *yellowPort, char *redPor
     #endif
 }
 
-void testCycleTrafficLight1() {
+void cycleTrafficLight1() {
     time_t startTime,endTime;
     int colorTimerFlag = 0;
     while(1) {
@@ -253,7 +242,7 @@ void testCycleTrafficLight1() {
     }
 }
 
-void testCycleTrafficLight2() {
+void cycleTrafficLight2() {
     time_t startTime,endTime;
     int colorTimerFlag = 0;
     while(1) {
@@ -296,76 +285,6 @@ void testCycleTrafficLight2() {
                 }
             }
         }
-    }
-}
-
-void cycleTrafficLight1(void *trafficLight2ThreadId) {
-    //while(1) {
-        //PTHREAD_COND_SIGNAL wakes the thread and begins traffic sequence
-        #ifdef DEBUG
-        (void) printf("Green1 on: %s\n", GPIO_PATH_44);
-        (void) printf("Red1 off: %s\n", GPIO_PATH_67);
-        #else
-        (void) writeLED("/value", GPIO_PATH_44, "1");
-        (void) writeLED("/value", GPIO_PATH_67, "0");
-        #endif
-
-        sleep(10);
-
-        #ifdef DEBUG
-        (void) printf("Green1 off: %s\n", GPIO_PATH_44);
-        (void) printf("Yellow1 on: %s\n", GPIO_PATH_68);
-        #else
-        (void) writeLED("/value", GPIO_PATH_44, "0");
-        (void) writeLED("/value", GPIO_PATH_68, "1");
-        #endif
-
-        sleep(5);
-
-        #ifdef DEBUG
-        (void) printf("Yellow1 off: %s\n", GPIO_PATH_68);
-        (void) printf("Red1 on: %s\n", GPIO_PATH_67);
-        #else
-        (void) writeLED("/value", GPIO_PATH_68, "0");
-        (void) writeLED("/value", GPIO_PATH_67, "1");
-        #endif
-        //PTHREAD_COND_SIGNAL send a signal to the opposite traffic light to start
-        //PTHREAD_COND_WAIT halts the thread
-   //}
-}
-
-void cycleTrafficLight2(void *trafficLight1ThreadId) {
-    while(1) {
-        //PTHREAD_COND_SIGNAL wakes the thread and begins traffic sequence
-        #ifdef DEBUG
-        (void) printf("Green1 on: %s\n", GPIO_PATH_26);
-        (void) printf("Red1 off: %s\n", GPIO_PATH_65);
-        #else
-        (void) writeLED("/value", GPIO_PATH_26, "1");
-        (void) writeLED("/value", GPIO_PATH_65, "0");
-        #endif
-
-        sleep(10);
-
-        #ifdef DEBUG
-        (void) printf("Green1 off: %s\n", GPIO_PATH_26);
-        (void) printf("Yellow1 on: %s\n", GPIO_PATH_46);
-        #else
-        (void) writeLED("/value", GPIO_PATH_26, "0");
-        (void) writeLED("/value", GPIO_PATH_46, "1");
-        #endif
-
-        sleep(5);
-
-        #ifdef DEBUG
-        (void) printf("Yellow1 off: %s\n", GPIO_PATH_46);
-        (void) printf("Red1 on: %s\n", GPIO_PATH_65);
-        #else
-        (void) writeLED("/value", GPIO_PATH_46, "0");
-        (void) writeLED("/value", GPIO_PATH_65, "1");
-        #endif
-        //PTHREAD_COND_SIGNAL send a signal to the opposite traffic light to start
-        //PTHREAD_COND_WAIT halts the thread
     }
 }
 
