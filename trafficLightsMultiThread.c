@@ -97,7 +97,7 @@ int main(void) {
 }
 
 void testArgument(void* trafficPort) {
-    printf((char*[25])trafficPort);
+    printf((char*)trafficPort);
 }
 
 void trafficLight1Thread() {
