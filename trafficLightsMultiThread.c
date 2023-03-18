@@ -80,8 +80,8 @@ int main(void) {
     setLightInitialState(trafficLight2Ports[0], trafficLight2Ports[1], trafficLight2Ports[2]);
 
     //Set initial signal handlers
-    //signal(SIGILL, trafficLight1InterruptHandler);
-    //signal(SIGHUP, trafficLight2InterruptHandler);
+    signal(SIGILL, trafficLight1InterruptHandler);
+    signal(SIGHUP, trafficLight2InterruptHandler);
 
     //Set conditions for trafficLight sigwait
     sigemptyset(&trafficLight1Set);
@@ -92,19 +92,20 @@ int main(void) {
     pthread_sigmask(SIG_BLOCK, &trafficLight2Set, 0);
 
     /* Create independent threads each of which will execute function */
-    //pthread_create( &thread1, NULL, (void*) getButton1PressDuration, NULL);
-    //pthread_create( &thread2, NULL, (void*) getButton2PressDuration, NULL);
-    //pthread_create( &thread3, NULL, (void *) cycleTrafficLight1, NULL);
-    //pthread_create( &thread4, NULL, (void *) cycleTrafficLight2, NULL);
+    pthread_create( &thread1, NULL, (void*) getButton1PressDuration, NULL);
+    pthread_create( &thread2, NULL, (void*) getButton2PressDuration, NULL);
+    pthread_create( &thread3, NULL, (void *) cycleTrafficLight1, NULL);
+    pthread_create( &thread4, NULL, (void *) cycleTrafficLight2, NULL);
 
-    //pthread_join(thread3, NULL);
-    //pthread_join(thread4, NULL);
-
-    pthread_create( &thread1, NULL, (void*) testWait, NULL);
-    pthread_create( &thread2, NULL, (void*) testSignalWaitSend, NULL);
     pthread_kill(thread1, SIGALRM);
-    pthread_join(thread1, NULL);
-    pthread_join(thread2, NULL);
+
+    pthread_join(thread3, NULL);
+    pthread_join(thread4, NULL);
+
+    //pthread_create( &thread1, NULL, (void*) testWait, NULL);
+    //pthread_create( &thread2, NULL, (void*) testSignalWaitSend, NULL);
+    //pthread_join(thread1, NULL);
+    //pthread_join(thread2, NULL);
 	return 0;
 }
 
