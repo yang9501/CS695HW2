@@ -46,11 +46,21 @@ void getButton2PressDuration();
 void trafficLight1InterruptHandler();
 void trafficLight2InterruptHandler();
 
-void testSignalWaitSend();
-void testWait();
+void testTrafficLight1();
+void testTrafficLight2();
+
+void trafficLight1Cycle();
+void trafficLight2Cycle();
 
 pthread_t thread1, thread2, thread3, thread4;
 sigset_t trafficLight1Set, trafficLight2Set;
+
+pthread_mutex_t timerMutex;
+time_t start_time;
+time_t end_time;
+
+pthread_mutex_t batonMutex;
+int baton = 0;
 
 int main(void) {
     //arrays containing GPIO port definitions, representing each of the two traffic lights
@@ -79,52 +89,69 @@ int main(void) {
     setLightInitialState(trafficLight1Ports[0], trafficLight1Ports[1], trafficLight1Ports[2]);
     setLightInitialState(trafficLight2Ports[0], trafficLight2Ports[1], trafficLight2Ports[2]);
 
-    //Set initial signal handlers
-    signal(SIGILL, trafficLight1InterruptHandler);
-    signal(SIGHUP, trafficLight2InterruptHandler);
-
-    //Set conditions for trafficLight sigwait
-    sigemptyset(&trafficLight1Set);
-    sigemptyset(&trafficLight2Set);
-    sigaddset(&trafficLight1Set, SIGALRM);
-    sigaddset(&trafficLight2Set, SIGBUS);
-    pthread_sigmask(SIG_BLOCK, &trafficLight1Set, 0);
-    pthread_sigmask(SIG_BLOCK, &trafficLight2Set, 0);
+    pthread_mutex_init(&batonMutex, NULL)
+    pthread_mutex_init(&timerMutex, NULL)
 
     /* Create independent threads each of which will execute function */
     pthread_create( &thread1, NULL, (void*) getButton1PressDuration, NULL);
     pthread_create( &thread2, NULL, (void*) getButton2PressDuration, NULL);
-    pthread_create( &thread3, NULL, (void *) cycleTrafficLight1, NULL);
-    pthread_create( &thread4, NULL, (void *) cycleTrafficLight2, NULL);
-    sleep(1);
-    pthread_kill(thread3, SIGALRM);
+    //pthread_create( &thread3, NULL, (void *) test, NULL);
+    //pthread_create( &thread4, NULL, (void *) cycleTrafficLight2, NULL);
+
+    pthread_create( &thread3, NULL, (void *) testTrafficLight1, NULL);
+    pthread_create( &thread4, NULL, (void *) testTrafficLight2, NULL);
 
     pthread_join(thread3, NULL);
     pthread_join(thread4, NULL);
 
-    //pthread_create( &thread1, NULL, (void*) testWait, NULL);
-    //pthread_create( &thread2, NULL, (void*) testSignalWaitSend, NULL);
-    //pthread_join(thread1, NULL);
-    //pthread_join(thread2, NULL);
 	return 0;
 }
 
-void testSignalWaitSend() {
+void testTrafficLight1() {
     while(1) {
-        sleep(4);
-        pthread_kill(thread1, SIGALRM);
+        //If it's traffic light 1's turn
+        if(baton == 0) {
+            trafficLight1Cycle();
+            pthread_mutex_lock(&batonMutex);
+            baton = 1;
+            pthread_mutex_unlock(&batonMutex);
+        }
+        //If it's traffic light 2's turn
+        if(baton == 1) {
+            setLightInitialState(GPIO_PATH_44, GPIO_PATH_68, GPIO_PATH_67);
+        }
     }
 }
 
-void testWait() {
+void testTrafficLight2() {
     while(1) {
-        int sig;
-        sigwait(&trafficLight1Set, &sig);
-        for(int i = 0; i < 5; i++) {
-            printf("hello\n");
-            fflush(stdout);
+        //If it's traffic light 1's turn
+        if(baton == 0) {
+            setLightInitialState(GPIO_PATH_26, GPIO_PATH_46, GPIO_PATH_65);
+        }
+        if(baton == 1) {
+            trafficLight2Cycle();
+            pthread_mutex_lock(&batonMutex);
+            baton = 0;
+            pthread_mutex_unlock(&batonMutex);
         }
     }
+}
+
+void trafficLight1Cycle() {
+    (void) writeLED("/value", GPIO_PATH_44, "1");
+    sleep(GREEN_LIGHT_TIME);
+    (void) writeLED("/value", GPIO_PATH_44, "0");
+    (void) writeLED("/value", GPIO_PATH_68, "1");
+    sleep(YELLOW_LIGHT_TIME);
+}
+
+void trafficLight2Cycle() {
+    (void) writeLED("/value", GPIO_PATH_26, "1");
+    sleep(GREEN_LIGHT_TIME);
+    (void) writeLED("/value", GPIO_PATH_26, "0");
+    (void) writeLED("/value", GPIO_PATH_46, "1");
+    sleep(YELLOW_LIGHT_TIME);
 }
 
 //SIGILL: TrafficLight1's signal to be interrupted and set to red
@@ -171,21 +198,15 @@ void getButton1PressDuration() {
     int gpioValue;
     while(1) {
         gpioValue = readGPIO("/value", GPIO_PATH_66);
-        //printf("%d", pressedFlag);
         if(gpioValue == 1){
             //first press detected
             if(pressedFlag == 0) {
-                //printf("FIRST PRESSED");
                 start_time = time(NULL);
-                //printf("%ld", start_time);
-                fflush( stdout );   //https://stackoverflow.com/questions/16870059/printf-not-printing-to-screen
                 pressedFlag = 1;
             }
             else {
                 end_time = time(NULL);
                 if(((end_time - start_time) >= 5)) {
-                    //printf("GREATER THAN 5\n");
-                    //fflush( stdout );
                     //SEND SIGNAL TO OPPOSITE LIGHT HANDLER TO INTERRUPT AND RESET TO RED
                     if(signalSentFlag == 0) {
                         pthread_kill(thread4, SIGHUP);
