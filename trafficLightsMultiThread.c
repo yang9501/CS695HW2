@@ -50,6 +50,7 @@ void testSignalWaitSend();
 void testWait();
 
 pthread_t thread1, thread2, thread3, thread4;
+sigset_t set;
 
 int main(void) {
     //arrays containing GPIO port definitions, representing each of the two traffic lights
@@ -91,6 +92,10 @@ int main(void) {
     //pthread_join(thread3, NULL);
     //pthread_join(thread4, NULL);
 
+    sigemptyset(&set);
+    sigaddset(&set, SIGINT);
+    pthread_sigmask(SIG_BLOCK, &set, 0);
+
     pthread_create( &thread1, NULL, (void*) testWait, NULL);
     pthread_create( &thread2, NULL, (void*) testSignalWaitSend, NULL);
     pthread_join(thread1, NULL);
@@ -106,13 +111,8 @@ void testSignalWaitSend() {
 }
 
 void testWait() {
-    sigset_t set;
-    sigemptyset(&set);
-    sigaddset(&set, SIGALRM);
     while(1) {
         int sig;
-        printf("starting wait\n");
-        fflush(stdout);
         sigwait(&set, &sig);
         for(int i = 0; i < 5; i++) {
             printf("hello\n");
