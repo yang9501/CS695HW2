@@ -208,7 +208,7 @@ void trafficLight2ToYellowPhase() {
         time_t runTime = endTime - startTime;
         pthread_mutex_unlock(&timerMutex);
         if (runTime >= YELLOW_LIGHT_TIME + GREEN_LIGHT_TIME) {
-            //if 10 seconds have elapsed since the light has turned green, turn green light off and yellow light on
+            //if 15 seconds have elapsed since the light has turned green, turn yellow light off and red light on
             (void) writeLED("/value", GPIO_PATH_46, "0");
             (void) writeLED("/value", GPIO_PATH_65, "1");
             return;
