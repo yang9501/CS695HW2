@@ -114,7 +114,7 @@ void testWait() {
     while(1) {
         int sig;
         printf("starting wait\n");
-        fflush(stdout)
+        fflush(stdout);
         sigwait(&set, &sig);
         printf("wait over\n");
         fflush(stdout);
