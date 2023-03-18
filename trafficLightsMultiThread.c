@@ -86,13 +86,18 @@ int main(void) {
     /* Create independent threads each of which will execute function */
     pthread_create( &thread1, NULL, (void*) getButtonPressDuration, (void*) buttonPorts[0]);
     pthread_create( &thread2, NULL, (void*) getButtonPressDuration, (void*) buttonPorts[1]);
-    pthread_create( &thread3, NULL, (void *) trafficLight1Thread, (void*) trafficLight1Ports);
-    pthread_create( &thread4, NULL, (void *) trafficLight2Thread, NULL);
+    printf("%s", trafficLight1Ports);
+    //pthread_create( &thread3, NULL, (void *) trafficLight1Thread, (void*) trafficLight1Ports);
+    //pthread_create( &thread4, NULL, (void *) trafficLight2Thread, NULL);
 
     pthread_join(thread3, NULL);
     pthread_join(thread4, NULL);
 
 	return 0;
+}
+
+void testArgument(void* trafficPort) {
+    printf((char*[25])trafficPort);
 }
 
 void trafficLight1Thread() {
@@ -216,7 +221,7 @@ void getButtonPressDuration(void *buttonPort) {
                 end_time = time(NULL);
                 if(((end_time - start_time) >= 5)) {
                     if(signalSentFlag == 0) {
-                        //ADD RED LIGHT CHECK
+                        //If the buttonPort corresponds with trafficLight1, and trafficLight1 is red, then allow the interrupt
                         if(strcmp((char*) buttonPort,  GPIO_PATH_66) == 0) {
                             if(readGPIO("/value", GPIO_PATH_67) == 1) {
                                 pthread_mutex_lock(&timerMutex);
@@ -231,6 +236,7 @@ void getButtonPressDuration(void *buttonPort) {
                                 signalSentFlag = 1;
                             }
                         }
+                        //If the buttonPort corresponds with trafficLight2, and trafficLight2 is red, then allow the interrupt
                         if(strcmp((char*) buttonPort,  GPIO_PATH_69) == 0) {
                             if(readGPIO("/value", GPIO_PATH_65) == 1) {
                                 pthread_mutex_lock(&timerMutex);
