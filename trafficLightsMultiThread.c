@@ -22,7 +22,7 @@
 #define GPIO_PATH_66 "/sys/class/gpio/gpio66" //Button 1
 #define GPIO_PATH_69 "/sys/class/gpio/gpio69" //Button 2
 
-#define GREEN_LIGHT_TIME 10
+#define GREEN_LIGHT_TIME 120
 #define YELLOW_LIGHT_TIME 5
 #define BUTTON_PRESS_DURATION 5
 
@@ -89,7 +89,7 @@ uint32_t main(void) {
     pthread_create( &thread3, NULL, (void *) trafficLight1Thread, trafficLight1Ports);
     pthread_create( &thread4, NULL, (void *) trafficLight2Thread, trafficLight2Ports);
     #else
-    pthread_create( &thread1, NULL, (void*) getButtonPressDuration, (void*) buttonPorts[0]);
+    (void) pthread_create( &thread1, NULL, (void*) getButtonPressDuration, (void*) buttonPorts[0]);
     (void) pthread_create( &thread2, NULL, (void*) getButtonPressDuration, (void*) buttonPorts[1]);
     (void) pthread_create( &thread3, NULL, (void *) trafficLight1Thread, trafficLight1Ports);
     (void) pthread_create( &thread4, NULL, (void *) trafficLight2Thread, trafficLight2Ports);
