@@ -6,9 +6,6 @@ To run trafficLightsMultithread.c: (comment or uncomment line 12 to toggle DEBUG
 1. gcc -pthread trafficLightsMultiThread.c -o trafficLightsMultiThread
 2. ./trafficLightsMultiThread
 
-When running on QEMU env, I found that I had to include the -std=c99 tag
-gcc -pthread -std=c99 trafficLightsMultiThread.c -o trafficLightsMultiThread
-
 I pictured this problem as a state machine dependent on the color of each light and the amount of time passed for each color running.  For example, a state could include trafficLight1 as red and traffic light 2 at yellow. Then, this particular state would not allow a button interrupt transition since there would not be a sufficient amount of buffer time, as per the spec.  I used 4 threads, 2 for each light and 2 for each button(line 92). I created mutexes to protect the light state as well as the time modification used for early cycling(line 82).  When the button is held for 5 seconds, the opposite light sequence triggers when the light is green (line 211).  However if the light has less than 5 seconds on the sequence, then it cycles normally(line 218).
 
 MISRA Reflection:
